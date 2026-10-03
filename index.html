@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<meta name="app-version" content="3-compact-bar">
+<meta name="app-version" content="4-multi-section">
 <meta name="googlebot" content="noindex, nofollow">
 <title>Lesson Idea Magazine</title>
 <meta name="description" content="A cozy flip-through magazine of first-grade lesson ideas.">
@@ -311,15 +311,19 @@ svg{display:block}
 textarea.inp{min-height:118px;resize:vertical;font-family:var(--font-hand);font-size:21px;line-height:30px;padding-top:8px;
   background-image:linear-gradient(transparent 29px,#e1ecf8 29px,#e1ecf8 30px);background-size:100% 30px;background-attachment:local;background-position:0 1px}
 textarea.inp.short{min-height:88px}
-.secs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
-.secopt{position:relative}
-.secopt input{position:absolute;opacity:0;pointer-events:none}
-.secopt span{display:flex;align-items:center;gap:8px;min-height:48px;padding:6px 10px;border-radius:14px;border:2.5px solid var(--sc);background:#fff;font-weight:500;font-size:15px;line-height:1.1;cursor:pointer;transition:background .15s}
+.secs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:13px 9px;padding-top:6px}
+.secopt{position:relative;display:block;width:100%;text-align:left}
+.secopt span{display:flex;align-items:center;gap:8px;min-height:48px;padding:6px 10px;border-radius:14px;border:2.5px solid var(--sc);background:#fff;font-weight:500;font-size:15px;line-height:1.1;cursor:pointer;transition:background .15s,transform .1s}
+.secopt:active span{transform:scale(.97)}
 .secopt span i{flex:none;width:30px;height:30px;border-radius:50%;background:var(--st);display:flex;align-items:center;justify-content:center}
 .secopt span i svg{width:22px;height:22px}
-.secopt input:checked+span{background:var(--sc);color:var(--so)}
-.secopt input:checked+span i{background:#fff}
-.secopt input:focus-visible+span{box-shadow:0 0 0 4px rgba(0,0,0,.15)}
+.secopt em{font-style:normal;flex:1;min-width:0}
+.secopt .prim{display:none;position:absolute;top:-9px;right:8px;font-size:11px;line-height:16px;font-weight:700;background:#fff;color:var(--sc);border:2px solid var(--sc);border-radius:999px;padding:0 7px;box-shadow:0 2px 0 rgba(0,0,0,.08)}
+.secopt[aria-pressed="true"] span{background:var(--sc);color:var(--so)}
+.secopt[aria-pressed="true"] span i{background:#fff}
+.secopt.primary span{box-shadow:0 0 0 3px rgba(0,0,0,.12)}
+.secopt.primary .prim{display:inline-block}
+.secopt:focus-visible span{box-shadow:0 0 0 4px rgba(0,0,0,.15)}
 .tagpick{display:flex;flex-wrap:wrap;gap:8px}
 .newtag{display:flex;gap:8px;margin-top:10px}
 .newtag .inp{flex:1;padding:9px 13px;font-size:17px}
@@ -333,6 +337,7 @@ textarea.inp.short{min-height:88px}
 .favrow svg{width:30px;height:30px}
 .err{color:#d23c3c;font-size:15px;margin-top:6px;display:none}
 .fld.bad .err{display:block}.fld.bad .inp{border-color:#e46a6a}
+.ls-top .sec-pill{flex:none}
 .set-sec{background:#fff;border-radius:18px;padding:16px;margin-bottom:16px;box-shadow:0 0 0 2px #f0e6d3 inset}
 .set-sec h3{margin:0 0 6px;font-size:19px;display:flex;align-items:center;gap:8px}
 .set-sec p{margin:4px 0 12px;color:var(--ink2);font-size:15.5px;line-height:1.4}
@@ -400,9 +405,9 @@ textarea.inp.short{min-height:88px}
 <div class="toast" id="toast" role="status"></div>
 <script>
 (()=>{'use strict';
-const SEED_VERSION = 1;
+const SEED_VERSION = 2;  // v2: starters may belong to several sections
 const STARTER_RAW = [];
-function L(section,title,summary,materials,steps,notes,tags){STARTER_RAW.push({section,title,summary,materials:materials.split(';').map(s=>s.trim()),steps:steps.split('|').map(s=>s.trim()),notes,tags:tags.split(',').map(s=>s.trim())});}
+function L(secs,title,summary,materials,steps,notes,tags){const sections=secs.split('+');STARTER_RAW.push({section:sections[0],sections,title,summary,materials:materials.split(';').map(s=>s.trim()),steps:steps.split('|').map(s=>s.trim()),notes,tags:tags.split(',').map(s=>s.trim())});}
 
 /* ---------------- MATH ---------------- */
 L('math','Number Line Hop',
@@ -423,19 +428,19 @@ L('math','Paper Clip Measuring',
  'Show a pencil measured the wrong way (with gaps and overlaps). Ask: "What went wrong?"|Model lining up clips end-to-end starting at the very edge.|Partners estimate first, then measure 5 objects and record.|Put the objects in order from shortest to longest.|Share: "Did anything measure exactly the same?"',
  'Next day, measure the same objects with cubes and talk about why the numbers changed (1.MD.A.2).',
  'Hands-on,Centers,Small Group');
-L('math','100 Things Collections',
+L('math+holidays','100 Things Collections',
  'Families send in 100 small objects; students sort them into groups of ten and count by tens to 100.',
  'Zip bags with a family note;10-cup sorting mats or ten-frames;Hundreds chart;Recording sheet',
  'A week ahead, send home a note asking for 100 small items (cereal, buttons, pom-poms, LEGO).|On 100th Day, students sort their items into 10 groups of 10.|Count together by tens: 10, 20, 30… 100!|Double-check by coloring a hundreds chart while counting by ones.|Do a gallery walk: why do some collections look bigger even though they are all 100?',
  'Keep a few extra collections ready for anyone who forgets.',
  '100th Day,Hands-on,Whole Group');
-L('math','Pumpkin Investigation',
+L('math+holidays+science','Pumpkin Investigation',
  'A hands-on pumpkin day: estimate, measure, test sink or float, and count the seeds by tens.',
  'One small pumpkin per group;Yarn & scissors;Scale;Tub of water;Cups & paper towels;Pumpkin recording booklet',
  'Estimate how big around the pumpkin is by cutting a piece of yarn. Wrap it around to check who was close!|Weigh the pumpkin and compare it to classroom objects.|Predict: sink or float? Test it in the tub (it floats!).|Scoop the seeds and count them by putting 10 in each cup.|Write one sentence about something surprising.',
  'Messy but memorable! Cut the tops off ahead of time. Pumpkins float because they are hollow inside.',
  'Fall,Halloween,Hands-on,Small Group');
-L('math','Shape Monster Builders',
+L('math+art','Shape Monster Builders',
  'Students compose new shapes with pattern blocks, then design a friendly "shape monster" and count its sides and corners.',
  'Pattern blocks;Paper shape cutouts;Glue sticks;Construction paper;Googly eyes (optional)',
  'Review shape names, sides, and vertices (corners).|Challenge: build a hexagon out of other blocks. How many ways can you find?|Students glue paper shapes together to build a monster.|Fill in: "My monster has __ triangles and __ squares."|Partners count the total number of sides on each other\'s monsters.',
@@ -467,13 +472,13 @@ L('literacy','Sound Boxes',
  'Say a word slowly: "ship."|Students repeat it and push one counter per sound: /sh/ /i/ /p/.|Count it up: 3 sounds, but 4 letters!|Replace the counters with letters.|Read the word back together.',
  'Keep it short (5–8 minutes). Fantastic for intervention groups.',
  'Small Group,Hands-on');
-L('literacy','How to Build a Snowman',
+L('literacy+holidays','How to Build a Snowman',
  'Sequencing writing with First, Next, Then, and Last — students write a how-to for building a snowman.',
  'Snowman picture cards;Four-flap writing paper;Crayons;Cotton balls (optional)',
  'Read a snowman book and talk about the steps.|Put the picture cards in order as a class.|Model a sentence for each transition word.|Students write and illustrate each step on their flaps.|Share with a partner and act out the steps.',
  'Swap the topic by season: How to Carve a Pumpkin, How to Plant a Seed, How to Make a Valentine.',
  'Winter,Whole Group');
-L('literacy','Valentine Kindness Letters',
+L('literacy+holidays+sel','Valentine Kindness Letters',
  'Students learn the parts of a friendly letter and write a kind valentine to a classmate or school helper.',
  'Heart stationery;Friendly letter anchor chart;Crayons & stickers;Envelopes',
  'Introduce the parts: date, greeting, body, closing, signature.|Brainstorm kind words and compliments together.|Draw names so everyone receives a letter.|Write and decorate the letters.|Deliver them to mailboxes on Valentine\'s Day.',
@@ -511,7 +516,7 @@ L('science','Shadow Tracing',
  'Model shadows indoors with a flashlight and a toy.|Outside in the morning, trace partner shadows and mark where their feet were.|Return after lunch, stand in the same spot, and trace again.|Compare: What changed? Why?|Record observations and draw both shadows.',
  'Connects to 1-ESS1-1 (patterns of the sun). Check the forecast for a sunny day!',
  'Spring,Hands-on,Whole Group');
-L('science','Good Vibrations',
+L('science+music','Good Vibrations',
  'Students discover that sound is made by vibrations using rubber bands, drums, and dancing rice.',
  'Rubber bands;Shoebox or plastic container;Rice;Bowl covered with plastic wrap;Tuning fork (optional)',
  'Hum with a hand on your throat — what do you feel?|Stretch rubber bands over a box and pluck them.|Sprinkle rice on the plastic-wrap drum and tap nearby — watch it bounce!|Compare loud taps and soft taps.|Finish the sentence: "Sound is made when…"',
@@ -537,19 +542,19 @@ L('social','Then and Now: School Long Ago',
  'Show a one-room schoolhouse photo. What do you notice? What do you wonder?|Compare it with a photo of your classroom.|Sort picture cards into Then and Now.|Write: "Long ago, kids ___. Today we ___."|Discuss: What is still the same?',
  'Invite a grandparent to share school memories.',
  'Whole Group,Small Group');
-L('social','Our Class Promise',
+L('social+sel','Our Class Promise',
  'Students create and sign a class promise, learning why rules help a community work together.',
  'Chart paper;Markers;Washable paint for handprints (or crayons);A picture book about rules',
  'Read a story about rules.|Discuss: Why do families, schools, and towns need rules?|Brainstorm promises as positive statements ("We use kind words").|Vote on 4–5 promises.|Everyone signs or adds a handprint.',
  'Refer back to it all year. Pairs well with the SEL section.',
  'Back to School,Whole Group');
-L('social','Family Traditions Graph',
+L('social+holidays','Family Traditions Graph',
  'Students share family traditions and build a class graph showing how families celebrate.',
  'Family survey sheet;Sticky notes;Graph chart;Picture books about traditions',
  'Send home a short survey about a favorite family tradition.|Students share their tradition in a circle.|Group similar traditions and graph them with sticky notes.|Discuss what is the same and different.|Make a class book of traditions.',
  'Keep it inclusive — every tradition counts (even pancake Saturdays!).',
  'Thanksgiving,Fall,Whole Group');
-L('social','Needs vs. Wants Shop',
+L('social+math','Needs vs. Wants Shop',
  'Students sort pictures into needs and wants, then "shop" with a pretend budget.',
  'Needs/wants picture cards;Play money ($10 each);Price tags;Small items for a pretend store',
  'Define needs (food, water, shelter, clothing) and wants.|Sort picture cards together.|Give each student $10 to shop.|They must buy a need first, then a want if money remains.|Reflect: Was it hard to choose?',
@@ -575,13 +580,13 @@ L('art','Symmetry Butterflies',
  'Talk about symmetry in nature.|Drop paint on one side of the fold.|Fold, press, and open to reveal the match.|When dry, add a pipe-cleaner body.|Hang them in the windows.',
  'Ties nicely to a life cycle science unit.',
  'Spring,Hands-on');
-L('art','Salt Watercolor Snowflakes',
+L('art+holidays','Salt Watercolor Snowflakes',
  'Draw snowflakes with glue, sprinkle salt, and touch on watercolor — the color spreads like magic.',
  'Dark blue or black cardstock;White glue;Table salt;Liquid watercolors;Droppers',
  'Look at real snowflake photos — six points!|Draw a snowflake with glue.|Cover it with salt and shake off the extra.|Gently touch watercolor to the salt and watch it travel.|Dry flat overnight.',
  'Use trays to catch the salt. Drip slowly for the best effect.',
  'Winter,Christmas,Hands-on');
-L('art','Fall Leaf Rubbings',
+L('art+science','Fall Leaf Rubbings',
  'Students collect leaves and make crayon rubbings to reveal veins, edges, and shapes.',
  'Fresh leaves;Peeled crayons in fall colors;Thin paper;Tape',
  'Go on a leaf walk around the playground.|Place a leaf vein-side up under the paper.|Rub with the side of a peeled crayon.|Layer more leaves in different colors.|Label the leaf parts (stem, veins, edge).',
@@ -595,19 +600,19 @@ L('art','Mirror Self-Portraits',
  'Back to School,Whole Group');
 
 /* ---------------- MUSIC & MOVEMENT ---------------- */
-L('music','Feelings Freeze Dance',
+L('music+sel','Feelings Freeze Dance',
  'Dance when the music plays; when it stops, freeze in the shape of the feeling on the card.',
  'Music player;Feelings cards (happy, sad, mad, surprised, scared);Open space',
  'Review the feelings and what our faces and bodies look like for each.|Play music while students dance.|Stop the music and hold up a feelings card.|Students freeze showing that feeling.|Ask: "When have you felt that way?"',
  'A brain break and SEL lesson in one.',
  'Whole Group,Brain Break');
-L('music','Rhythm Names',
+L('music+literacy','Rhythm Names',
  'Clap the syllables in names, then read simple rhythm notation with "ta" and "ti-ti."',
  'Rhythm cards (quarter & eighth notes);Name cards;Rhythm sticks',
  'Clap each student\'s name.|Introduce "ta" (one sound on a beat) and "ti-ti" (two sounds on a beat).|Match names to rhythm cards.|Play the rhythms with sticks.|Students compose their own 4-beat rhythm.',
  'Builds phonological awareness too!',
  'Whole Group,Small Group');
-L('music','Skip-Count Workout',
+L('music+math','Skip-Count Workout',
  'Count by 2s, 5s, and 10s while doing exercises — math and movement together.',
  'Hundreds chart or skip-counting song;Exercise picture cards',
  'Choose a number to count by.|Pick an exercise (jumping jacks, squats, arm circles).|Count aloud with every move up to 100.|Switch exercises and numbers.|Cool down by counting backward slowly.',
@@ -625,7 +630,7 @@ L('music','Shaker Eggs & Steady Beat',
  'Fill eggs with rice or beans and seal them with tape.|Compare the sounds of different fillings.|Practice a steady beat with a favorite song.|Play loud/soft and fast/slow.|Form a class band!',
  'Tape the eggs very well!',
  'Hands-on,Spring');
-L('music','Parachute Patterns',
+L('music+math','Parachute Patterns',
  'Use a play parachute to make AB and ABC movement patterns.',
  'Play parachute;Soft balls;Music',
  'Everyone holds a handle.|Make small waves and big waves.|Create a pattern: up-down-up-down (AB).|Add more: up-down-shake (ABC).|Pop balls off the top!',
@@ -633,43 +638,43 @@ L('music','Parachute Patterns',
  'Whole Group,Hands-on');
 
 /* ---------------- HOLIDAYS & SEASONS ---------------- */
-L('holidays','All About Me Bag',
+L('holidays+sel','All About Me Bag',
  'Students bring three items in a paper bag that tell about themselves, then share with the class.',
  'Paper lunch bags;Family letter;Sharing schedule',
  'Model by sharing your own bag.|Send bags home with a note.|Each day, 3–4 students share their items.|Classmates ask one question each.|Graph the things you have in common.',
  'Builds community during the first weeks.',
  'Back to School,Whole Group');
-L('holidays','Build-a-Monster Adjectives',
+L('holidays+literacy','Build-a-Monster Adjectives',
  'Students create friendly monsters and describe them using adjectives.',
  'Construction paper shapes;Googly eyes;Glue;Adjective word bank',
  'Read "Go Away, Big Green Monster!"|Brainstorm describing words together.|Build a monster.|Write three sentences with adjectives.|Classmates guess which monster is being described.',
  'Friendly monsters, not scary ones!',
  'Halloween,Fall,Centers');
-L('holidays','Gratitude Turkey',
+L('holidays+sel','Gratitude Turkey',
  'Students write what they are thankful for on feathers to build a class turkey.',
  'Feather cutouts;Brown turkey body;Markers;Glue',
  'Talk about gratitude.|Students write one thank-you on each feather.|Add the feathers to the class turkey.|Share in a circle.|Send home a mini version for families.',
  'Display in the hallway all November.',
  'Thanksgiving,Fall,Whole Group');
-L('holidays','Gingerbread Man Hunt',
+L('holidays+literacy','Gingerbread Man Hunt',
  'After reading The Gingerbread Man, the class follows clues around school to find him.',
  'The Gingerbread Man book;Clue cards;Gingerbread cookies;School map',
  'Read the story together.|Discover the gingerbread man has run away!|Follow clues to the office, library, and gym.|Find him back in class with cookies.|Write a retell of the adventure.',
  'Let other staff in on the fun. Great for learning school locations.',
  'Christmas,Winter,Whole Group');
-L('holidays','Conversation Heart Graphing',
+L('holidays+math','Conversation Heart Graphing',
  'Sort, graph, and compare candy hearts by color.',
  'Conversation hearts (or paper hearts);Graph sheet;Crayons',
  'Estimate how many hearts are in your bag.|Sort them by color.|Make a bar graph.|Answer: Most? Least? How many more?|Read the messages for fun.',
  'Check for allergies; paper hearts work as an alternative.',
  "Valentine's Day,Hands-on,Small Group");
-L('holidays',"When I'm 100 Years Old",
+L('holidays+literacy',"When I'm 100 Years Old",
  'Students imagine life at 100 years old and write and draw about it.',
  'Writing paper;Crayons;Cotton balls (for white hair);Aging photo app (optional)',
  'Talk about what life might be like at 100.|Brainstorm ideas together.|Write: "When I am 100, I will…"|Draw yourself at 100.|Share with the class.',
  'Always a huge hit!',
  '100th Day,Whole Group');
-L('holidays','Leprechaun Trap STEM',
+L('holidays+science','Leprechaun Trap STEM',
  'Teams design and build a leprechaun trap from recyclables.',
  'Recyclables;Tape & glue;Gold coins;Planning sheet',
  'Read a leprechaun story.|Plan a trap.|Build with a partner.|Test it out.|Next morning, find tiny footprints!',
@@ -827,11 +832,19 @@ let lessons = [];            // all lessons (incl hidden)
 let settings = {teacherName:'Mrs. Jones'};
 let customTags = [];
 const byId = id => lessons.find(l=>l.id===id);
+// Sections model: l.sections = [primary, ...others]; l.section mirrors sections[0] for backward compatibility.
+function sectionsOf(l){
+  const raw = Array.isArray(l&&l.sections) && l.sections.length ? l.sections : [l&&l.section];
+  const out=[...new Set(raw.filter(id=>SEC[id]))];
+  return out.length? out : ['math'];
+}
+const primaryOf = l => sectionsOf(l)[0];
+const inSection = (l,id) => sectionsOf(l).includes(id);
 const visible = () => lessons.filter(l=>!l.hidden);
 function sortLessons(list, bySection){
   const secIdx = id => SECTIONS.findIndex(s=>s.id===id);
   return list.slice().sort((a,b)=>{
-    if(bySection){ const d=secIdx(a.section)-secIdx(b.section); if(d) return d; }
+    if(bySection){ const d=secIdx(primaryOf(a))-secIdx(primaryOf(b)); if(d) return d; }
     if(a.mine!==b.mine) return a.mine?-1:1;
     if(a.mine) return (b.created||0)-(a.created||0);
     return (a.order||0)-(b.order||0);
@@ -845,7 +858,7 @@ function allTags(){
 }
 function normalizeLesson(l){
   return {
-    id:String(l.id), section: SEC[l.section]? l.section : 'math',
+    id:String(l.id), sections: sectionsOf(l), section: sectionsOf(l)[0],
     title:String(l.title||'Untitled idea').slice(0,200), summary:String(l.summary||''),
     materials:Array.isArray(l.materials)?l.materials.map(String).filter(Boolean):[], steps:Array.isArray(l.steps)?l.steps.map(String).filter(Boolean):[],
     notes:String(l.notes||''), tags:Array.isArray(l.tags)?[...new Set(l.tags.map(t=>String(t).trim()).filter(Boolean))]:[],
@@ -858,7 +871,7 @@ function normalizeLesson(l){
 /* ================= Page rendering ================= */
 function secVars(s){ return `--c:${s.color};--cd:${s.cd};--tint:${s.tint};--on:${s.on}`; }
 function tagChip(t, act=true){ return `<button class="chip" style="--tc:${tagColor(t)}" ${act?`data-act="open-tag" data-tag="${esc(t)}"`:''}><span class="hash">#</span>${esc(t)}</button>`; }
-function counts(){ const c={}; visible().forEach(l=>{c[l.section]=(c[l.section]||0)+1}); return c; }
+function counts(){ const c={}; visible().forEach(l=>sectionsOf(l).forEach(id=>{c[id]=(c[id]||0)+1})); return c; }
 const plural=(n,w)=>`${n} ${w}${n===1?'':'s'}`;
 
 function renderTOC(){
@@ -920,21 +933,21 @@ function renderCover(d){
 }
 function renderLesson(l){
   if(!l) return renderFiller();
-  const s=SEC[l.section]||SECTIONS[0];
+  const secs=sectionsOf(l).map(id=>SEC[id]); const s=secs[0];
   const badge = l.mine ? `<span class="badge mine">${ICON.heart} My idea</span>` : `<span class="badge starter">Starter idea</span>${l.edited?'<span class="badge edited">· edited</span>':''}`;
   const mats = l.materials.length? `<section class="blk"><h3>${ICON.scissors} Materials</h3><ul class="mats">${l.materials.map(m=>`<li>${esc(m)}</li>`).join('')}</ul></section>`:'';
   const steps = l.steps.length? `<section class="blk"><h3>${ICON.list} Steps</h3><ol class="steps">${l.steps.map(m=>`<li>${esc(m)}</li>`).join('')}</ol></section>`:'';
   const notes = l.notes? `<div class="sticky pink">${PAPERCLIP}<b>Teacher notes</b>${esc(l.notes).replace(/\n/g,'<br>')}</div>`:'';
   const photo = l.photo? `<figure class="polaroid" style="margin-left:auto;margin-right:auto"><span class="tape"></span><img src="${l.photo}" alt="Photo for ${esc(l.title)}" draggable="false" loading="eager"><figcaption class="cap">${esc(l.title)}</figcaption></figure>`:'';
   return `<div class="page lesson" style="${secVars(s)}" data-lesson="${esc(l.id)}"><div class="page-scroll"><div class="sheet">
-    <div class="ls-top"><button class="sec-pill" data-act="open-section" data-id="${s.id}"><i>${DOODLE[s.id]}</i>${esc(s.short||s.name)}</button>${badge}<span class="ls-spacer"></span>
+    <div class="ls-top">${secs.map(x=>`<button class="sec-pill" style="${secVars(x)}" data-act="open-section" data-id="${x.id}"><i>${DOODLE[x.id]}</i>${esc(x.short||x.name)}</button>`).join('')}${badge}<span class="ls-spacer"></span>
       <button class="ic-btn fav" data-act="fav" data-id="${esc(l.id)}" aria-pressed="${l.fav}" aria-label="${l.fav?'Remove from favorites':'Add to favorites'}">${l.fav?ICON.starOn:ICON.starOff}</button>
       <button class="ic-btn" data-act="edit" data-id="${esc(l.id)}" aria-label="Edit lesson">${ICON.pencil}</button></div>
     <h2 class="ls-title"><span>${esc(l.title)}</span></h2>
     ${l.summary?`<div class="sticky"><span class="tape"></span>${esc(l.summary)}</div>`:''}
     ${photo}${mats}${steps}${notes}
     ${l.tags.length?`<div class="tags">${l.tags.map(t=>tagChip(t)).join('')}</div>`:''}
-    <div class="ls-foot"><hr>${esc(s.name)}<hr></div>
+    <div class="ls-foot"><hr>${secs.map(x=>esc(x.name)).join(' · ')}<hr></div>
   </div></div></div>`;
 }
 function renderFiller(d={}){
@@ -967,7 +980,7 @@ function makeBook(kind,key=''){
   const endFor=(o)=>({t:'end',...o});
   let b;
   if(kind==='section' && SEC[key]){
-    const s=SEC[key], list=sortLessons(v.filter(l=>l.section===key));
+    const s=SEC[key], list=sortLessons(v.filter(l=>inSection(l,key)));
     b={title:s.name, style:s, pages:[cover({kicker:'Section',title:s.name,tagline:s.tagline,doodle:s.id,style:s,sectionId:s.id},list),...lessonPages(list),endFor({sectionId:s.id,title:`That's all for ${s.short||s.name}!`,text:'Add your own idea to this section any time.'})]};
   } else if(kind==='tag' && key){
     const list=sortLessons(v.filter(l=>l.tags.includes(key)),true);
@@ -994,7 +1007,7 @@ function makeBook(kind,key=''){
 function shade(hex,amt=.78){ const n=parseInt(hex.slice(1),16); const r=Math.round((n>>16&255)*amt),g=Math.round((n>>8&255)*amt),bb=Math.round((n&255)*amt); return '#'+((1<<24)|(r<<16)|(g<<8)|bb).toString(16).slice(1); }
 function searchLessons(q){
   const terms=q.toLowerCase().split(/\s+/).filter(Boolean);
-  return visible().filter(l=>{ const hay=[l.title,l.summary,l.notes,...l.materials,...l.steps,...l.tags,SEC[l.section]?.name].join(' ').toLowerCase(); return terms.every(t=>hay.includes(t)); });
+  return visible().filter(l=>{ const hay=[l.title,l.summary,l.notes,...l.materials,...l.steps,...l.tags,...sectionsOf(l).map(id=>SEC[id].name)].join(' ').toLowerCase(); return terms.every(t=>hay.includes(t)); });
 }
 function buildViews(pages, spread){
   const views=[]; let i=0;
@@ -1292,14 +1305,15 @@ function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('sh
 /* ---------- Lesson form ---------- */
 function openForm(lesson, presetSec){
   const isNew=!lesson;
-  const l = lesson? structuredClone(lesson) : {section:presetSec||'math',title:'',summary:'',materials:[],steps:[],notes:'',tags:[],fav:false,photo:null};
+  const l = lesson? structuredClone(lesson) : {sections:[presetSec&&SEC[presetSec]?presetSec:'math'],title:'',summary:'',materials:[],steps:[],notes:'',tags:[],fav:false,photo:null};
   const tagsSel=new Set(l.tags); let photo=l.photo||null;
-  const s0=SEC[l.section]||SECTIONS[0];
-  const secOpts=SECTIONS.map(s=>`<label class="secopt" style="--sc:${s.color};--st:${s.tint};--so:${s.on}"><input type="radio" name="sec" value="${s.id}" ${s.id===l.section?'checked':''}><span><i>${DOODLE[s.id]}</i>${esc(s.short||s.name)}</span></label>`).join('');
+  const secSel=sectionsOf(l);  // ordered; first = primary
+  const s0=SEC[secSel[0]];
+  const secOpts=SECTIONS.map(s=>`<button type="button" class="secopt" style="--sc:${s.color};--st:${s.tint};--so:${s.on}" data-sec="${s.id}" aria-pressed="false"><span><i>${DOODLE[s.id]}</i><em>${esc(s.short||s.name)}</em><b class="prim">★ main</b></span></button>`).join('');
   const html=`<div class="mhead"><h2>${isNew?ICON.pencil:ICON.pencil} ${isNew?'New lesson idea':'Edit lesson'}</h2><button class="x" data-close aria-label="Close">${ICON.x}</button></div>
   <form class="mbody" id="lessonForm" autocomplete="off" novalidate>
     <div class="fld" id="fTitle"><label for="fi-title">Title</label><input class="inp" id="fi-title" name="title" maxlength="140" placeholder="e.g. Apple Tasting Graph" value="${esc(l.title)}"><div class="err">Please give your idea a title 🙂</div></div>
-    <div class="fld"><div class="lbl">Section</div><div class="secs">${secOpts}</div></div>
+    <div class="fld" id="fSecs"><div class="lbl">Sections <span class="hint">pick one or more — the first (★ main) sets the page color</span></div><div class="secs" id="secPick">${secOpts}</div><div class="err">Pick at least one section 🙂</div></div>
     <div class="fld"><label for="fi-sum">Kid-friendly summary <span class="hint">What's the big idea?</span></label><textarea class="inp short" id="fi-sum" name="summary" placeholder="Students taste red, green & yellow apples and graph their favorite.">${esc(l.summary)}</textarea></div>
     <div class="fld"><label for="fi-mat">Materials <span class="hint">one per line</span></label><textarea class="inp" id="fi-mat" name="materials" placeholder="Apples (red, green, yellow)&#10;Plates&#10;Graph chart">${esc(l.materials.join('\n'))}</textarea></div>
     <div class="fld"><label for="fi-steps">Steps <span class="hint">one per line</span></label><textarea class="inp" id="fi-steps" name="steps" placeholder="Slice the apples&#10;Taste each color&#10;Vote with sticky notes">${esc(l.steps.join('\n'))}</textarea></div>
@@ -1313,7 +1327,10 @@ function openForm(lesson, presetSec){
   const w=openModal(html,{style:secVars(s0)});
   const sheet=$('.msheet',w), form=$('#lessonForm',w);
   form.addEventListener('submit',e=>e.preventDefault());
-  $$('input[name=sec]',w).forEach(r=>r.addEventListener('change',()=>{ const s=SEC[r.value]; sheet.setAttribute('style',secVars(s)); }));
+  const drawSecs=()=>{ $$('#secPick .secopt',w).forEach(b=>{ const i=secSel.indexOf(b.dataset.sec); b.setAttribute('aria-pressed',i>=0); b.classList.toggle('primary',i===0); });
+    if(secSel.length){ sheet.setAttribute('style',secVars(SEC[secSel[0]])); $('#fSecs',w).classList.remove('bad'); } };
+  drawSecs();
+  $('#secPick',w).addEventListener('click',e=>{ const b=e.target.closest('[data-sec]'); if(!b) return; const id=b.dataset.sec; const i=secSel.indexOf(id); if(i>=0) secSel.splice(i,1); else secSel.push(id); drawSecs(); });
   const drawTags=()=>{ const all=[...new Set([...allTags(),...tagsSel])]; $('#tagPick',w).innerHTML=all.map(t=>`<button type="button" class="chip" style="--tc:${tagColor(t)}" data-t="${esc(t)}" aria-pressed="${tagsSel.has(t)}"><span class="hash">#</span>${esc(t)}</button>`).join(''); };
   drawTags();
   $('#tagPick',w).addEventListener('click',e=>{ const b=e.target.closest('[data-t]'); if(!b) return; const t=b.dataset.t; tagsSel.has(t)?tagsSel.delete(t):tagsSel.add(t); b.setAttribute('aria-pressed',tagsSel.has(t)); });
@@ -1330,8 +1347,9 @@ function openForm(lesson, presetSec){
   $('#saveBtn',w).addEventListener('click',async()=>{
     const title=$('#fi-title',w).value.trim();
     if(!title){ $('#fTitle',w).classList.add('bad'); $('#fi-title',w).focus(); return; }
+    if(!secSel.length){ $('#fSecs',w).classList.add('bad'); $('#fSecs',w).scrollIntoView({block:'center',behavior:'smooth'}); return; }
     const now=Date.now();
-    const data={ title, section:$('input[name=sec]:checked',w).value, summary:$('#fi-sum',w).value.trim(), materials:lines($('#fi-mat',w).value), steps:lines($('#fi-steps',w).value), notes:$('#fi-notes',w).value.trim(), tags:[...tagsSel], photo, fav, updated:now };
+    const data={ title, sections:[...secSel], section:secSel[0], summary:$('#fi-sum',w).value.trim(), materials:lines($('#fi-mat',w).value), steps:lines($('#fi-steps',w).value), notes:$('#fi-notes',w).value.trim(), tags:[...tagsSel], photo, fav, updated:now };
     let rec;
     if(isNew){ rec=normalizeLesson({id:uid(),mine:true,starter:false,created:now,...data}); lessons.push(rec); }
     else { rec=byId(lesson.id); Object.assign(rec,data); if(rec.starter) rec.edited=true; }
@@ -1351,8 +1369,9 @@ function afterChange(id,isNew){
     if(fresh.pages.some(p=>p.t==='lesson'&&p.id===id)){ rebuildBook(id); return; }
     if(!isNew){ rebuildBook(); return; }
   }
-  const b=makeBook('section',l.section); const pi=b.pages.findIndex(p=>p.t==='lesson'&&p.id===id);
-  openBook('section',l.section,Math.max(0,pi));
+  const ps=(cur.book.kind==='section'&&inSection(l,cur.book.key))?cur.book.key:primaryOf(l);
+  const b=makeBook('section',ps); const pi=b.pages.findIndex(p=>p.t==='lesson'&&p.id===id);
+  openBook('section',ps,Math.max(0,pi));
 }
 function compressImage(file){
   return new Promise((res,rej)=>{
@@ -1371,7 +1390,7 @@ function openSearch(){
     <div id="results"></div></div>`,{style:secVars(SPECIAL.search)});
   const q=$('#q',w), out=$('#results',w);
   const draw=()=>{ const v=q.value.trim(); if(!v){ out.innerHTML=''; return; } const r=sortLessons(searchLessons(v),true);
-    out.innerHTML = r.length? `<div class="res-list"><button class="btn blue" data-sflip style="align-self:flex-start">${ICON.hand} Flip through ${plural(r.length,'result')}</button>${r.map(l=>{const s=SEC[l.section]; return `<button class="res" style="--rc:${s.cd}" data-goto="${esc(l.id)}"><span class="bar" style="background:${s.color}"></span><span><div class="t">${esc(l.title)}</div><div class="s">${esc(l.summary)}</div><div class="m">${esc(s.name)}${l.mine?' · My idea':''}</div></span></button>`;}).join('')}</div>` : `<div class="empty">No ideas match “${esc(v)}” yet.</div>`; };
+    out.innerHTML = r.length? `<div class="res-list"><button class="btn blue" data-sflip style="align-self:flex-start">${ICON.hand} Flip through ${plural(r.length,'result')}</button>${r.map(l=>{const s=SEC[primaryOf(l)]; return `<button class="res" style="--rc:${s.cd}" data-goto="${esc(l.id)}"><span class="bar" style="background:${s.color}"></span><span><div class="t">${esc(l.title)}</div><div class="s">${esc(l.summary)}</div><div class="m">${sectionsOf(l).map(id=>esc(SEC[id].name)).join(' · ')}${l.mine?' · My idea':''}</div></span></button>`;}).join('')}</div>` : `<div class="empty">No ideas match “${esc(v)}” yet.</div>`; };
   q.addEventListener('input',draw);
   q.addEventListener('keydown',e=>{ if(e.key==='Enter'&&q.value.trim()){ closeModal(w); openBook('search',q.value.trim()); } });
   out.addEventListener('click',e=>{ const g=e.target.closest('[data-goto]'); const v=q.value.trim(); if(g){ closeModal(w); const b=makeBook('search',v); const pi=b.pages.findIndex(p=>p.t==='lesson'&&p.id===g.dataset.goto); openBook('search',v,Math.max(0,pi)); } else if(e.target.closest('[data-sflip]')){ closeModal(w); openBook('search',v); } });
@@ -1392,7 +1411,7 @@ async function openSettings(){
       <div class="row"><button class="btn primary" id="expBtn">${ICON.download} Export backup</button><button class="btn ghost" id="impBtn">${ICON.upload} Import backup</button><input type="file" id="impFile" accept="application/json,.json" hidden></div></div>
     <div class="set-sec"><h3>📦 Storage</h3><p>${persisted===true?'✅ This device has agreed to keep your ideas safe (persistent storage is on).':persisted===false?'Storage is “best effort.” Adding this app to your Home Screen helps keep it safe — and exporting backups is always a good idea.':'Storage status unavailable.'} ${used?'('+used+')':''}</p>
       ${persisted===false?`<div class="row"><button class="btn ghost" id="persistBtn">Ask to keep my data safe</button></div>`:''}</div>
-    <div class="set-sec"><h3>🙈 Hidden starter ideas (${hidden.length})</h3>${hidden.length? hidden.map(l=>`<div class="hid-item"><span class="t">${esc(l.title)} <span style="color:${SEC[l.section].cd};font-size:14px">· ${esc(SEC[l.section].name)}</span></span><button class="btn ghost" data-unhide="${esc(l.id)}">Show again</button></div>`).join('') : '<p>None — every starter idea is showing.</p>'}</div>
+    <div class="set-sec"><h3>🙈 Hidden starter ideas (${hidden.length})</h3>${hidden.length? hidden.map(l=>`<div class="hid-item"><span class="t">${esc(l.title)} <span style="color:${SEC[primaryOf(l)].cd};font-size:14px">· ${sectionsOf(l).map(id=>esc(SEC[id].name)).join(', ')}</span></span><button class="btn ghost" data-unhide="${esc(l.id)}">Show again</button></div>`).join('') : '<p>None — every starter idea is showing.</p>'}</div>
   </div><div class="mfoot"><span class="sp"></span><button class="btn blue" data-close>Done</button></div>`,{style:secVars(SPECIAL.mine)});
   const tn=$('#tname',w); tn.addEventListener('change',async()=>{ settings.teacherName=tn.value.trim()||'My'; await DB.setMeta('settings',settings); if(cur.book.kind==='home') refreshView(); else updateChrome(); });
   $('#expBtn',w).addEventListener('click',exportBackup);
@@ -1402,7 +1421,7 @@ async function openSettings(){
   w.addEventListener('click',async e=>{ const u=e.target.closest('[data-unhide]'); if(!u) return; const l=byId(u.dataset.unhide); l.hidden=false; await DB.put(l); u.closest('.hid-item').remove(); rebuildBook(); toast('Showing again'); });
 }
 async function exportBackup(){
-  const data={app:'lesson-idea-magazine',version:1,exportedAt:new Date().toISOString(),settings,customTags,lessons};
+  const data={app:'lesson-idea-magazine',version:2,exportedAt:new Date().toISOString(),settings,customTags,lessons};
   const json=JSON.stringify(data); const d=new Date(); const name=`lesson-ideas-backup-${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}.json`;
   const blob=new Blob([json],{type:'application/json'});
   let shared=false;
@@ -1414,7 +1433,9 @@ async function importBackup(file){
   let data; try{ data=JSON.parse(await file.text()); }catch(e){ toast('That file is not a valid backup'); return false; }
   const list = Array.isArray(data)? data : data&&Array.isArray(data.lessons)? data.lessons : null;
   if(!list){ toast('That file is not a lesson backup'); return false; }
-  const clean=list.filter(l=>l&&l.id&&l.title).map(normalizeLesson);
+  // Old (v1) backups have a single `section`; normalizeLesson converts to `sections`.
+  // Untouched starter ideas pick up any extra sections from the current starter set.
+  const clean=list.filter(l=>l&&l.id&&l.title).map(normalizeLesson).map(l=>{ if(l.starter&&!l.edited&&!Array.isArray((list.find(x=>String(x.id)===l.id)||{}).sections)){ const st=STARTERS.find(x=>x.id===l.id); if(st){ l.sections=[...st.sections]; l.section=l.sections[0]; } } return l; });
   if(!await confirmBox(`Import ${plural(clean.length,'idea')}? Ideas already here with the same ID will be replaced by the backup copy. Nothing else is removed.`,{ok:'Import',danger:false,title:'Import backup'})) return false;
   await DB.putMany(clean);
   if(data.customTags&&Array.isArray(data.customTags)){ customTags=[...new Set([...customTags,...data.customTags.map(String)])]; await DB.setMeta('customTags',customTags); }
@@ -1424,13 +1445,41 @@ async function importBackup(file){
 }
 async function requestPersist(){ try{ if(navigator.storage&&navigator.storage.persist){ return await navigator.storage.persist(); } }catch(e){} return false; }
 
+/* ================= Migration ================= */
+const SCHEMA_VERSION = 2; // v1: single `section`; v2: `sections` array (+ `section` mirror of the primary)
+async function migrate(){
+  const schema = (await DB.getMeta('schemaVersion')) || 1;
+  const seeded = (await DB.getMeta('seedVersion')) || 1;
+  if(schema>=SCHEMA_VERSION && seeded>=SEED_VERSION) return;
+  const all = await DB.all();
+  const have = new Set(all.map(l=>l.id));
+  const changed = [];
+  for(const rec of all){
+    let dirty=false;
+    // Non-destructive: only ADD `sections`; every other field (photo, fav, hidden, edited, text…) is left untouched.
+    if(!Array.isArray(rec.sections) || !rec.sections.length){ rec.sections = sectionsOf(rec); dirty=true; }
+    if(rec.section!==rec.sections[0]){ rec.section=rec.sections[0]; dirty=true; }
+    // Starter ideas she never edited pick up new second sections from the updated starter set.
+    if(seeded<SEED_VERSION && rec.starter && !rec.edited){
+      const st=STARTERS.find(x=>x.id===rec.id);
+      if(st){ const merged=[...new Set([...rec.sections, ...st.sections])]; if(merged.length!==rec.sections.length){ rec.sections=merged; dirty=true; } }
+    }
+    if(dirty) changed.push(rec);
+  }
+  // Any brand-new starters in this version (none removed, hidden ones stay hidden).
+  if(seeded<SEED_VERSION) STARTERS.filter(s=>!have.has(s.id)).forEach(s=>changed.push(structuredClone(s)));
+  if(changed.length) await DB.putMany(changed);   // single transaction: all-or-nothing
+  await DB.setMeta('schemaVersion',SCHEMA_VERSION);
+  await DB.setMeta('seedVersion',SEED_VERSION);
+}
+
 /* ================= Boot ================= */
 async function boot(){
   await DB.open();
   if(DB.mem) setTimeout(()=>toast('Private mode: ideas will not be saved after closing'),800);
   const seeded=await DB.getMeta('seedVersion');
-  if(!seeded){ await DB.putMany(STARTERS.map(s=>structuredClone(s))); await DB.setMeta('seedVersion',SEED_VERSION); }
-  else if(seeded<SEED_VERSION){ const have=new Set((await DB.all()).map(l=>l.id)); await DB.putMany(STARTERS.filter(s=>!have.has(s.id)).map(s=>structuredClone(s))); await DB.setMeta('seedVersion',SEED_VERSION); }
+  if(!seeded){ await DB.putMany(STARTERS.map(s=>structuredClone(s))); await DB.setMeta('seedVersion',SEED_VERSION); await DB.setMeta('schemaVersion',SCHEMA_VERSION); }
+  await migrate();
   lessons=(await DB.all()).map(normalizeLesson);
   settings=Object.assign({teacherName:'Mrs. Jones'},await DB.getMeta('settings')||{});
   customTags=(await DB.getMeta('customTags'))||[];
