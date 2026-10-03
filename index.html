@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="googlebot" content="noindex, nofollow">
+<title>Lesson Idea Magazine</title>
+<meta name="description" content="A cozy flip-through magazine of first-grade lesson ideas.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Lesson Ideas">
+<meta name="application-name" content="Lesson Ideas">
+<meta name="theme-color" content="#ffffff">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#2d2a32; --ink2:#5d5866; --paper:#fffdf7; --desk:#f5ecdc; --hdr:#ffffff;
+  --radius:18px;
+  --font-h:'Fredoka',ui-rounded,'Arial Rounded MT Bold','Avenir Next',system-ui,sans-serif;
+  --font-hand:'Patrick Hand','Chalkboard SE','Comic Sans MS',cursive;
+  --c:#F2545B; --cd:#c23b42; --tint:#FFE5E6; --on:#fff;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--hdr);color:var(--ink);font-family:var(--font-h);overscroll-behavior:none;-webkit-text-size-adjust:100%}
+body{position:fixed;inset:0;overflow:hidden;display:flex;flex-direction:column}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0;margin:0}
+svg{display:block}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- Top bar (solid) ---------- */
+.topbar{flex:none;background:var(--hdr);position:relative;z-index:30;
+  padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}
+.topbar-inner{height:58px;display:flex;align-items:center;gap:8px}
+.crayon-stripe{flex:none;height:7px;position:relative;z-index:29;
+  background:repeating-linear-gradient(90deg,#F2545B 0 48px,#F7882F 48px 96px,#E9B200 96px 144px,#22B07D 144px 192px,#14A9C2 192px 240px,#3D8BF2 240px 288px,#9B5DE5 288px 336px,#F15BB5 336px 384px)}
+.tb-btn{min-width:46px;height:46px;border-radius:15px;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 11px;
+  background:#f6f1e7;font-weight:600;font-size:16px;color:var(--ink);transition:transform .12s,background .2s}
+.tb-btn:active{transform:scale(.94)}
+.tb-btn svg{width:24px;height:24px}
+.tb-btn.home{background:var(--tint);color:var(--cd)}
+.tb-title{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:9px;font-weight:600;font-size:19px}
+.tb-title span.t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-title .dot{flex:none;width:14px;height:14px;border-radius:50%;background:var(--c);box-shadow:0 0 0 3px var(--tint)}
+@media (max-width:560px){ .tb-btn .lbl{display:none} .tb-title{font-size:17px} }
+
+/* ---------- Desk & book ---------- */
+.desk{flex:1;position:relative;overflow:hidden;background-color:var(--desk);
+  background-image:radial-gradient(rgba(150,110,60,.10) 1.2px,transparent 1.6px);background-size:18px 18px}
+.book{position:absolute;inset:14px 16px 14px 16px;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+@media (max-width:600px){ .book{inset:8px 8px 8px 8px} }
+.view{position:absolute;inset:0;display:flex;border-radius:var(--radius);overflow:hidden;background:var(--paper);
+  box-shadow:0 12px 30px rgba(80,50,10,.18),0 2px 0 rgba(80,50,10,.08);transform:translateZ(0)}
+.view.enter{animation:viewIn .32s cubic-bezier(.2,.8,.2,1)}
+@keyframes viewIn{from{opacity:0;transform:scale(.965) translateY(8px)}to{opacity:1;transform:none}}
+.view.spread::after{content:"";position:absolute;top:0;bottom:0;left:50%;width:70px;transform:translateX(-50%);pointer-events:none;z-index:3;
+  background:linear-gradient(90deg,transparent,rgba(60,40,10,.07) 40%,rgba(60,40,10,.18) 50%,rgba(60,40,10,.07) 60%,transparent)}
+.page{position:relative;flex:1 1 0;min-width:0;height:100%;overflow:hidden;container-type:inline-size}
+.page-scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.page-scroll::-webkit-scrollbar{width:0;height:0}
+.page img{-webkit-user-drag:none;user-select:none}
+
+/* ---------- Flip machinery ---------- */
+.flip{position:absolute;inset:0;z-index:6;pointer-events:none;perspective:2200px;perspective-origin:50% 50%}
+.half{position:absolute;top:0;bottom:0;width:50%;overflow:hidden;transform:translateZ(0)}
+.half.hl{left:0;border-radius:var(--radius) 0 0 var(--radius)}
+.half.hr{left:50%;border-radius:0 var(--radius) var(--radius) 0}
+.half-inner{position:absolute;top:0;bottom:0}
+.half-inner>.view{box-shadow:none;animation:none}
+.shade{position:absolute;inset:0;opacity:0;pointer-events:none;z-index:4}
+.flipper{position:absolute;top:0;bottom:0;width:50%;will-change:transform;z-index:5}
+.flipper.fr{left:50%;transform-origin:0 50%}
+.flipper.fl{left:0;transform-origin:100% 50%}
+.flipper>.half{left:0;width:100%}
+.flipper>.half.back{transform:rotateY(180deg)}
+.flip-shadow{position:absolute;top:0;bottom:0;width:50%;pointer-events:none;z-index:4;opacity:0}
+
+/* ---------- Bottom bar (solid) ---------- */
+.bottombar{flex:none;background:var(--hdr);border-top:2px solid #f0e6d3;position:relative;z-index:30;
+  padding:0 max(12px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(12px,env(safe-area-inset-left))}
+.bottombar-inner{height:58px;display:flex;align-items:center;gap:12px}
+.pg-btn{width:56px;height:44px;border-radius:14px;background:var(--tint);color:var(--cd);display:flex;align-items:center;justify-content:center;transition:transform .12s,opacity .2s}
+.pg-btn:active{transform:scale(.92)}
+.pg-btn[disabled]{opacity:.35;cursor:default}
+.pg-btn svg{width:26px;height:26px}
+.pg-mid{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:5px}
+.pg-text{font-size:15px;font-weight:500;color:var(--ink2)}
+.pg-track{width:min(320px,100%);height:9px;border-radius:9px;background:#f1eadd;overflow:hidden;position:relative}
+.pg-fill{position:absolute;left:0;top:0;bottom:0;border-radius:9px;background:var(--c);transition:width .35s ease;
+  background-image:repeating-linear-gradient(-45deg,rgba(255,255,255,.25) 0 6px,transparent 6px 12px)}
+
+/* ---------- FAB ---------- */
+.fab{position:absolute;right:max(26px,env(safe-area-inset-right));bottom:24px;z-index:20;width:70px;height:70px;border-radius:50%;
+  background:#F2545B;color:#fff;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 0 #c23b42,0 12px 22px rgba(194,59,66,.35);transition:transform .15s}
+.fab svg{width:36px;height:36px}
+.fab:active{transform:translateY(4px);box-shadow:0 2px 0 #c23b42,0 6px 12px rgba(194,59,66,.3)}
+.fab::after{content:"";position:absolute;top:9px;left:16px;width:16px;height:9px;border-radius:50%;background:rgba(255,255,255,.35);transform:rotate(-30deg)}
+@media (max-width:600px){ .fab{width:62px;height:62px;right:18px;bottom:18px} }
+
+/* ---------- Shared bits ---------- */
+.hand{font-family:var(--font-hand)}
+.chip{display:inline-flex;align-items:center;gap:5px;min-height:36px;padding:4px 13px;border-radius:999px;font-weight:500;font-size:15px;
+  background:#fff;border:2px solid var(--tc,#ccc);color:var(--ink);transition:transform .1s,background .15s}
+.chip:active{transform:scale(.95)}
+.chip .hash{color:var(--tc,#999);font-weight:700}
+.chip[aria-pressed="true"]{background:var(--tc);color:#fff}
+.chip[aria-pressed="true"] .hash{color:#fff}
+.tape{position:absolute;width:86px;height:24px;background:rgba(255,236,150,.75);
+  background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.35) 0 6px,transparent 6px 12px);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.clip{position:absolute;width:26px;height:64px}
+.btn{min-height:48px;padding:0 20px;border-radius:16px;font-weight:600;font-size:17px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  background:#f3ede2;color:var(--ink);box-shadow:0 4px 0 rgba(90,70,40,.18);transition:transform .1s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(90,70,40,.18)}
+.btn svg{width:22px;height:22px}
+.btn.primary{background:#22B07D;color:#fff;box-shadow:0 4px 0 #168059}
+.btn.blue{background:#3D8BF2;color:#fff;box-shadow:0 4px 0 #2765bb}
+.btn.colored{background:var(--c);color:var(--on);box-shadow:0 4px 0 var(--cd)}
+.btn.danger{background:#fff;color:#d23c3c;box-shadow:0 0 0 2px #f4b9b9 inset,0 4px 0 rgba(210,60,60,.18)}
+.btn.ghost{background:#fff;box-shadow:0 0 0 2px #eadfca inset,0 4px 0 rgba(90,70,40,.12)}
+
+/* ---------- TOC ---------- */
+.toc{background-color:#fffbf2;background-image:radial-gradient(#ecdfc6 1.3px,transparent 1.6px);background-size:22px 22px}
+.toc .page-scroll{padding:18px clamp(14px,3.2cqw,38px) 110px}
+.chalkboard{position:relative;background:#2f5d50;color:#fbfaf3;border:12px solid #c08a4f;border-radius:16px;
+  box-shadow:inset 0 0 50px rgba(0,0,0,.4),inset 0 0 0 2px rgba(0,0,0,.15),0 5px 0 #8f5f2c,0 12px 20px rgba(80,50,10,.18);
+  background-image:radial-gradient(ellipse at 30% 20%,rgba(255,255,255,.08),transparent 60%),radial-gradient(ellipse at 80% 90%,rgba(255,255,255,.05),transparent 50%)}
+.toc-head{text-align:center;padding:16px 18px 30px;margin:4px 6px 0}
+.toc-head .kick{font-family:var(--font-hand);font-size:clamp(20px,3.4cqw,28px);opacity:.9;letter-spacing:.5px}
+.toc-head h1{margin:2px 0 0;font-weight:600;font-size:clamp(30px,6.4cqw,58px);line-height:1.02;letter-spacing:.5px;text-shadow:0 0 2px rgba(255,255,255,.5),0 0 12px rgba(255,255,255,.15)}
+.toc-head .sub{font-family:var(--font-hand);font-size:clamp(17px,2.6cqw,22px);margin-top:6px;opacity:.85}
+.toc-head .chalk-doodle{position:absolute;opacity:.8}
+.ledge{position:absolute;left:-12px;right:-12px;bottom:-22px;height:14px;background:#a8743d;border-radius:4px;box-shadow:0 3px 0 #7d5226}
+.ledge .crayon{position:absolute;bottom:12px}
+.toc-intro{display:flex;align-items:center;justify-content:center;gap:10px;margin:34px 0 4px;font-family:var(--font-hand);font-size:clamp(20px,3cqw,25px);color:var(--ink2);text-align:center}
+.toc-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(14px,2.2cqw,24px);margin-top:16px}
+.toc-row2{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2.2cqw,24px);margin-top:clamp(18px,2.6cqw,28px)}
+@container (max-width:640px){ .toc-grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@container (max-width:460px){ .toc-row2{grid-template-columns:1fr} }
+.tile{position:relative;background:var(--tint);border:3px solid var(--c);border-radius:24px;padding:18px 10px 14px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:158px;text-align:center;
+  box-shadow:0 6px 0 var(--cd),0 10px 18px rgba(0,0,0,.06);transition:transform .15s,box-shadow .15s;rotate:-1.2deg}
+.tile:nth-child(even){rotate:1.1deg}
+.tile:nth-child(3n){rotate:-.4deg}
+.tile:active{transform:translateY(5px);box-shadow:0 1px 0 var(--cd)}
+.tile .ic{width:clamp(62px,9cqw,84px);height:clamp(62px,9cqw,84px);border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 4px rgba(255,255,255,.6)}
+.tile .ic svg{width:78%;height:78%}
+.tile .nm{font-weight:600;font-size:clamp(16px,2.3cqw,20px);line-height:1.12;color:var(--ink)}
+.tile .ct{font-size:13px;font-weight:600;color:var(--cd);background:#fff;border-radius:999px;padding:2px 10px}
+.tile .tape{top:-12px;left:50%;margin-left:-43px;rotate:-4deg}
+.tile:nth-child(even) .tape{rotate:5deg;background-color:rgba(190,230,255,.75)}
+.tile.wide{flex-direction:row;justify-content:flex-start;min-height:96px;padding:12px 16px;gap:14px;text-align:left}
+.tile.wide .ic{width:62px;height:62px;flex:none}
+.tile.wide .tx{display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+.toc-foot{display:flex;justify-content:center;gap:16px;margin-top:30px;opacity:.95;flex-wrap:wrap}
+
+/* ---------- Cover ---------- */
+.cover{background-color:var(--c);color:var(--on);
+  background-image:radial-gradient(rgba(255,255,255,.2) 2.2px,transparent 2.8px),radial-gradient(rgba(255,255,255,.12) 2px,transparent 2.6px);
+  background-size:34px 34px,34px 34px;background-position:0 0,17px 17px}
+.cover .page-scroll{display:flex;flex-direction:column;align-items:center;padding:28px 22px 110px;text-align:center}
+.cover .page-scroll>:first-child{margin-top:auto}.cover .page-scroll>:last-child{margin-bottom:auto}
+.cover-card{position:relative;background:#fffdf7;color:var(--ink);border-radius:10px;padding:26px clamp(18px,5cqw,42px) 24px;width:min(560px,100%);rotate:-1.6deg;
+  box-shadow:0 10px 0 rgba(0,0,0,.12),0 20px 40px rgba(0,0,0,.15);
+  background-image:linear-gradient(90deg,transparent 36px,#f6a5a5 36px,#f6a5a5 38px,transparent 38px),linear-gradient(#fffdf7 33px,#d9e8f8 33px,#d9e8f8 34px);
+  background-size:100% 100%,100% 34px}
+.cover-card .clip{top:-26px;right:34px;rotate:8deg}
+.cover-kick{font-family:var(--font-hand);font-size:22px;color:var(--cd);letter-spacing:3px;text-transform:uppercase}
+.cover-title{margin:2px 0 4px;font-size:clamp(34px,8cqw,64px);line-height:1.02;font-weight:700;color:var(--c);text-shadow:3px 3px 0 var(--tint)}
+.cover-tag{font-family:var(--font-hand);font-size:clamp(20px,3.6cqw,26px);color:var(--ink2)}
+.cover-art{position:relative;width:min(56cqw,300px);aspect-ratio:1;margin:clamp(26px,5cqh,46px) 0 18px;border-radius:50%;background:#fff;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 12px rgba(255,255,255,.35),0 0 0 26px rgba(255,255,255,.15);animation:float 4s ease-in-out infinite}
+.cover-art svg{width:70%;height:70%}
+.cover-art .star{position:absolute;width:56px;height:56px}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
+.cover-count{display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--cd);border-radius:999px;padding:8px 18px;font-weight:600;font-size:19px;box-shadow:0 4px 0 rgba(0,0,0,.12)}
+.cover-hint{margin-top:22px;display:flex;align-items:center;gap:10px;font-family:var(--font-hand);font-size:22px;color:var(--on);opacity:.95}
+.cover-hint svg{width:30px;height:30px;animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(9px)}}
+.cover-actions{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;justify-content:center}
+.cover .btn.ghost{background:rgba(255,255,255,.95)}
+
+/* ---------- Lesson page ---------- */
+.lesson{background:#fffef9}
+.lesson::after{content:"";position:absolute;left:12px;top:0;bottom:0;width:22px;pointer-events:none;
+  background:radial-gradient(circle at 11px 50%,#e9e0cf 8px,rgba(0,0,0,.08) 9px,transparent 10px) 0 0/22px 33.33% repeat-y;opacity:.9}
+.sheet{position:relative;min-height:100%;padding:20px clamp(16px,4cqw,30px) 130px 72px;
+  background-image:linear-gradient(90deg,transparent 54px,#f4a3a3 54px,#f4a3a3 56px,transparent 56px),linear-gradient(transparent 31px,#d8e7f7 31px,#d8e7f7 32px);
+  background-size:100% 100%,100% 32px;background-position:0 0,0 6px}
+@container (max-width:440px){
+  .sheet{padding-left:46px;padding-right:14px;background-image:linear-gradient(90deg,transparent 34px,#f4a3a3 34px,#f4a3a3 36px,transparent 36px),linear-gradient(transparent 31px,#d8e7f7 31px,#d8e7f7 32px)}
+  .lesson::after{display:none}
+}
+.ls-top{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.sec-pill{display:inline-flex;align-items:center;gap:6px;background:var(--c);color:var(--on);border-radius:999px;padding:4px 13px 4px 6px;font-weight:600;font-size:14px;min-height:34px}
+.sec-pill i{width:26px;height:26px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}
+.sec-pill i svg{width:20px;height:20px}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;padding:5px 10px;min-height:30px}
+.badge.mine{background:#ffd6e8;color:#b0306f;rotate:3deg;box-shadow:2px 3px 0 rgba(176,48,111,.18);border-radius:3px}
+.badge.mine svg{width:15px;height:15px}
+.badge.starter{border:2px dashed #b9ad95;color:#8a7f69;border-radius:8px;background:rgba(255,255,255,.7);rotate:-2deg}
+.badge.edited{color:#8a7f69;font-weight:500}
+.ls-spacer{flex:1}
+.ic-btn{width:48px;height:48px;border-radius:15px;display:inline-flex;align-items:center;justify-content:center;background:#fff;box-shadow:0 0 0 2px #efe5d2 inset,0 3px 0 rgba(0,0,0,.06);transition:transform .12s}
+.ic-btn:active{transform:scale(.9)}
+.ic-btn svg{width:28px;height:28px}
+.ic-btn.fav[aria-pressed="true"]{background:#fff6d6;box-shadow:0 0 0 2px #ffd65c inset}
+.ic-btn.fav[aria-pressed="true"] svg{animation:pop .35s}
+@keyframes pop{50%{transform:scale(1.3) rotate(12deg)}}
+.ls-title{margin:6px 0 14px;font-size:clamp(27px,5.4cqw,40px);line-height:1.12;font-weight:700;color:var(--ink)}
+.ls-title span{background:linear-gradient(transparent 58%,var(--tint) 58%,var(--tint) 92%,transparent 92%);box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.sticky{position:relative;background:#fff59d;padding:18px 18px 16px;font-family:var(--font-hand);font-size:clamp(20px,3.4cqw,23px);line-height:1.35;
+  box-shadow:0 1px 1px rgba(0,0,0,.08),4px 8px 14px rgba(0,0,0,.1);border-radius:2px 2px 18px 2px;rotate:-.8deg;margin:6px 4px 22px}
+.sticky .tape{top:-12px;left:50%;margin-left:-43px;rotate:-3deg}
+.sticky.pink{background:#ffd3e6;rotate:.9deg}
+.sticky.blue{background:#cfe9ff}
+.sticky .clip{top:-22px;right:18px}
+.sticky b{font-family:var(--font-h);font-weight:600;font-size:16px;display:block;margin-bottom:2px}
+.blk{margin:6px 0 18px}
+.blk h3{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:21px;font-weight:600;color:var(--cd)}
+.blk h3 svg{width:28px;height:28px}
+.mats{list-style:none;margin:0;padding:0;font-family:var(--font-hand);font-size:clamp(20px,3.3cqw,22px);line-height:32px}
+.mats li{position:relative;padding-left:36px}
+.mats li::before{content:"";position:absolute;left:2px;top:11px;width:24px;height:11px;background:var(--mc,var(--c));
+  clip-path:polygon(0 50%,28% 0,100% 0,100% 100%,28% 100%);border-radius:0 3px 3px 0}
+.mats li:nth-child(5n+2)::before{--mc:#F7882F}.mats li:nth-child(5n+3)::before{--mc:#22B07D}.mats li:nth-child(5n+4)::before{--mc:#9B5DE5}.mats li:nth-child(5n+5)::before{--mc:#3D8BF2}
+.steps{list-style:none;margin:0;padding:0;counter-reset:st;font-family:var(--font-hand);font-size:clamp(20px,3.3cqw,22px);line-height:1.42}
+.steps li{position:relative;padding:4px 0 10px 46px;counter-increment:st;min-height:42px}
+.steps li::before{content:counter(st);position:absolute;left:0;top:2px;width:34px;height:34px;border-radius:50%;background:var(--c);color:var(--on);
+  font-family:var(--font-h);font-weight:700;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 var(--cd)}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.polaroid{position:relative;background:#fff;padding:10px 10px 12px;margin:18px auto 24px;width:min(100%,420px);rotate:1.8deg;box-shadow:0 2px 3px rgba(0,0,0,.1),4px 12px 22px rgba(0,0,0,.14)}
+.polaroid img{display:block;width:100%;max-height:340px;object-fit:cover;background:#eee}
+.polaroid .tape{top:-12px;left:50%;margin-left:-43px;rotate:-6deg;background-color:rgba(255,190,220,.75)}
+.polaroid .cap{font-family:var(--font-hand);text-align:center;font-size:19px;margin-top:6px;color:var(--ink2)}
+.ls-foot{margin-top:26px;display:flex;align-items:center;gap:10px;font-family:var(--font-hand);color:#a39a8a;font-size:18px}
+.ls-foot hr{flex:1;border:0;border-top:2px dashed #e6dcc8}
+
+/* ---------- Filler / end ---------- */
+.endpage .sheet{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding-bottom:110px}
+.endpage h2{margin:0;font-size:clamp(26px,5cqw,36px);color:var(--cd)}
+.endpage p{margin:0;font-family:var(--font-hand);font-size:22px;color:var(--ink2);max-width:420px}
+.endpage .art{width:min(48cqw,220px)}
+.endpage .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+
+/* ---------- Tag shelf (cork) ---------- */
+.cork{background-color:#d6a66b;background-image:radial-gradient(rgba(120,70,20,.25) 1px,transparent 1.5px),radial-gradient(rgba(255,240,210,.25) 1px,transparent 1.5px);
+  background-size:11px 13px,17px 15px;background-position:0 0,5px 7px}
+.cork .page-scroll{padding:22px clamp(16px,4cqw,34px) 120px}
+.cork-head{background:#fffdf7;border-radius:6px;padding:14px 18px;text-align:center;rotate:-1deg;box-shadow:0 8px 16px rgba(60,30,0,.25);position:relative;margin:6px auto 26px;max-width:520px}
+.cork-head h2{margin:0;font-size:clamp(26px,5cqw,36px);color:#c2570f}
+.cork-head p{margin:2px 0 0;font-family:var(--font-hand);font-size:20px;color:var(--ink2)}
+.pin{position:absolute;top:-9px;left:50%;width:22px;height:22px;margin-left:-11px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ff9a9a,#e03b3b 60%,#a51d1d);box-shadow:0 3px 3px rgba(0,0,0,.3)}
+.search-fake{display:flex;align-items:center;gap:10px;width:100%;max-width:520px;margin:0 auto 24px;min-height:54px;padding:0 18px;border-radius:999px;background:#fff;color:var(--ink2);font-size:18px;box-shadow:0 5px 0 rgba(90,50,10,.25)}
+.search-fake svg{width:24px;height:24px}
+.notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:20px 16px}
+.tnote{position:relative;min-height:92px;padding:20px 10px 12px;background:var(--nc,#fff59d);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  box-shadow:3px 7px 10px rgba(60,30,0,.25);border-radius:2px 2px 14px 2px;rotate:var(--r,0deg);transition:transform .15s}
+.tnote:active{transform:scale(.95)}
+.tnote .nm{font-family:var(--font-hand);font-size:22px;line-height:1.1}
+.tnote .ct{font-size:13px;font-weight:600;color:rgba(0,0,0,.5);margin-top:4px}
+
+/* ---------- Tips (chalk) ---------- */
+.tips{background:#2f5d50}
+.tips .page-scroll{padding:22px clamp(18px,4cqw,36px) 120px}
+.tips .chalkboard{padding:22px clamp(16px,4cqw,30px) 30px}
+.tips h2{margin:0 0 10px;font-size:clamp(28px,5cqw,40px);font-weight:600;text-align:center;text-shadow:0 0 2px rgba(255,255,255,.4)}
+.tips ul{list-style:none;margin:0;padding:0;font-family:var(--font-hand);font-size:clamp(20px,3.3cqw,23px);line-height:1.4}
+.tips li{display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-bottom:2px dashed rgba(255,255,255,.15)}
+.tips li:last-child{border-bottom:0}
+.tips li svg{flex:none;width:30px;height:30px;margin-top:2px}
+.tips .supplies{display:flex;justify-content:center;align-items:flex-end;gap:16px;margin-top:28px;flex-wrap:wrap}
+
+/* ---------- Modals ---------- */
+.modal-wrap{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:max(20px,env(safe-area-inset-top)) 20px max(20px,env(safe-area-inset-bottom));
+  background:rgba(45,32,15,.45);animation:fade .2s ease}
+.modal-wrap.closing{animation:fadeOut .18s ease forwards}
+@keyframes fade{from{opacity:0}}@keyframes fadeOut{to{opacity:0}}
+.msheet{--c:#3D8BF2;--cd:#2765bb;--tint:#e3eeff;background:#fffdf7;border-radius:26px;width:min(740px,100%);max-height:100%;display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 30px 60px rgba(0,0,0,.3);animation:popIn .28s cubic-bezier(.2,1.2,.4,1)}
+.msheet.small{width:min(440px,100%)}
+@keyframes popIn{from{transform:translateY(24px) scale(.96);opacity:0}}
+.mhead{flex:none;display:flex;align-items:center;gap:12px;padding:12px 14px 12px 20px;background:var(--c);color:var(--on,#fff);transition:background .25s}
+.mhead h2{flex:1;margin:0;font-size:22px;font-weight:600;display:flex;align-items:center;gap:10px}
+.mhead h2 svg{width:30px;height:30px}
+.mhead .x{width:46px;height:46px;border-radius:14px;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center}
+.mhead .x svg{width:24px;height:24px}
+.mbody{flex:1;overflow:auto;padding:18px 20px 24px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.mfoot{flex:none;display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 18px calc(12px + env(safe-area-inset-bottom));border-top:2px dashed #eadfca;background:#fff}
+.mfoot .sp{flex:1}
+@media (max-width:640px){
+  .modal-wrap{padding:0;align-items:stretch}
+  .msheet{border-radius:0;width:100%;max-height:none;height:100%}
+  .msheet.small{height:auto;margin:auto 16px;border-radius:22px;max-height:calc(100% - 40px)}
+  .mhead{padding-top:calc(12px + env(safe-area-inset-top))}
+  .msheet.small .mhead{padding-top:12px}
+}
+.fld{margin-bottom:18px}
+.fld>label,.fld>.lbl{display:flex;align-items:baseline;gap:8px;font-weight:600;font-size:17px;margin-bottom:7px}
+.fld .hint{font-weight:400;font-size:14px;color:var(--ink2)}
+.inp{width:100%;font:inherit;font-size:18px;color:var(--ink);background:#fff;border:2.5px solid #e6dac4;border-radius:15px;padding:12px 14px;outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none}
+.inp:focus{border-color:var(--c);box-shadow:0 0 0 4px var(--tint)}
+textarea.inp{min-height:118px;resize:vertical;font-family:var(--font-hand);font-size:21px;line-height:30px;padding-top:8px;
+  background-image:linear-gradient(transparent 29px,#e1ecf8 29px,#e1ecf8 30px);background-size:100% 30px;background-attachment:local;background-position:0 1px}
+textarea.inp.short{min-height:88px}
+.secs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
+.secopt{position:relative}
+.secopt input{position:absolute;opacity:0;pointer-events:none}
+.secopt span{display:flex;align-items:center;gap:8px;min-height:48px;padding:6px 10px;border-radius:14px;border:2.5px solid var(--sc);background:#fff;font-weight:500;font-size:15px;line-height:1.1;cursor:pointer;transition:background .15s}
+.secopt span i{flex:none;width:30px;height:30px;border-radius:50%;background:var(--st);display:flex;align-items:center;justify-content:center}
+.secopt span i svg{width:22px;height:22px}
+.secopt input:checked+span{background:var(--sc);color:var(--so)}
+.secopt input:checked+span i{background:#fff}
+.secopt input:focus-visible+span{box-shadow:0 0 0 4px rgba(0,0,0,.15)}
+.tagpick{display:flex;flex-wrap:wrap;gap:8px}
+.newtag{display:flex;gap:8px;margin-top:10px}
+.newtag .inp{flex:1;padding:9px 13px;font-size:17px}
+.newtag .btn{min-height:46px}
+.photo-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:130px;border:3px dashed #e1d3b8;border-radius:18px;background:#fffaf0;color:var(--ink2);font-size:17px;width:100%;cursor:pointer}
+.photo-drop svg{width:40px;height:40px}
+.photo-prev{position:relative;display:inline-block;max-width:100%}
+.photo-prev img{display:block;max-width:100%;max-height:260px;border-radius:14px;box-shadow:0 6px 14px rgba(0,0,0,.15)}
+.photo-prev .rm{position:absolute;top:8px;right:8px}
+.favrow{display:flex;align-items:center;gap:12px;min-height:52px;padding:6px 14px;border-radius:16px;background:#fff8dc;border:2.5px solid #ffe08a;font-weight:500;font-size:17px;width:100%;text-align:left}
+.favrow svg{width:30px;height:30px}
+.err{color:#d23c3c;font-size:15px;margin-top:6px;display:none}
+.fld.bad .err{display:block}.fld.bad .inp{border-color:#e46a6a}
+.set-sec{background:#fff;border-radius:18px;padding:16px;margin-bottom:16px;box-shadow:0 0 0 2px #f0e6d3 inset}
+.set-sec h3{margin:0 0 6px;font-size:19px;display:flex;align-items:center;gap:8px}
+.set-sec p{margin:4px 0 12px;color:var(--ink2);font-size:15.5px;line-height:1.4}
+.set-sec .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.hid-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px dashed #eadfca}
+.hid-item .t{flex:1;min-width:0;font-size:16px}
+.hid-item .btn{min-height:40px;font-size:15px;padding:0 14px}
+.namefix{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.namefix .inp{width:auto;flex:1;min-width:160px}
+.confirm-msg{font-size:18px;line-height:1.4;margin:4px 0}
+.res-list{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.res{display:flex;align-items:stretch;gap:12px;text-align:left;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 0 0 2px #f0e6d3 inset,0 3px 0 rgba(0,0,0,.05);width:100%}
+.res .bar{flex:none;width:8px;border-radius:8px;background:var(--rc)}
+.res .t{font-weight:600;font-size:17px}
+.res .s{font-family:var(--font-hand);font-size:18px;color:var(--ink2);line-height:1.25;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.res .m{font-size:13px;color:var(--rc);font-weight:600;margin-top:4px}
+.search-in{position:relative}
+.search-in svg{position:absolute;left:14px;top:50%;width:24px;height:24px;margin-top:-12px;color:#a59b88}
+.search-in .inp{padding-left:46px;border-radius:999px}
+.empty{text-align:center;color:var(--ink2);font-family:var(--font-hand);font-size:21px;padding:24px 0}
+
+/* ---------- Toast ---------- */
+.toast{position:fixed;left:50%;bottom:calc(80px + env(safe-area-inset-bottom));z-index:200;transform:translateX(-50%) translateY(20px);opacity:0;
+  background:#2d2a32;color:#fff;border-radius:999px;padding:12px 22px;font-weight:500;font-size:16px;box-shadow:0 10px 24px rgba(0,0,0,.25);transition:all .25s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ---------- Loading ---------- */
+.loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-hand);font-size:24px;color:var(--ink2)}
+@media (prefers-reduced-motion:reduce){ .cover-art,.cover-hint svg{animation:none} }
+
+@media (orientation:landscape) and (min-width:900px) and (max-height:900px){
+  .toc .page-scroll{padding-top:12px}
+  .toc-head{padding:8px 18px 22px}
+  .toc-head h1{font-size:44px}
+  .toc-head .kick{font-size:21px}.toc-head .sub{font-size:18px;margin-top:2px}
+  .toc-intro{margin:26px 0 0;font-size:21px}
+  .toc-grid{margin-top:12px;gap:16px 18px}
+  .toc-row2{margin-top:18px;gap:18px}
+  .tile{min-height:118px;padding:12px 8px 10px;gap:5px}
+  .tile .ic{width:58px;height:58px}
+  .tile.wide{min-height:78px}
+  .tile.wide .ic{width:52px;height:52px}
+  .cover-art{width:min(34cqw,230px)}
+}
+@media (max-width:600px){ .tile{min-height:136px} }
+</style>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <button class="tb-btn home" id="homeBtn" data-act="home" aria-label="Back to contents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg><span class="lbl">Contents</span></button>
+  <div class="tb-title"><span class="dot"></span><span class="t" id="tbTitle">Lesson Ideas</span></div>
+  <button class="tb-btn" data-act="search" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
+  <button class="tb-btn" data-act="settings" aria-label="Settings and backup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+</div></header>
+<div class="crayon-stripe" aria-hidden="true"></div>
+<main class="desk">
+  <div class="book" id="book" aria-live="polite"><div class="loading" id="loading">Sharpening pencils…</div></div>
+  <button class="fab" data-act="add" aria-label="Add a lesson idea"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+</main>
+<footer class="bottombar"><div class="bottombar-inner">
+  <button class="pg-btn" id="pgPrev" data-act="prev" aria-label="Previous page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <div class="pg-mid"><div class="pg-text" id="pgText">Page 1</div><div class="pg-track"><div class="pg-fill" id="pgFill"></div></div></div>
+  <button class="pg-btn" id="pgNext" data-act="next" aria-label="Next page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+</div></footer>
+<div class="toast" id="toast" role="status"></div>
+<script>
+(()=>{'use strict';
+const SEED_VERSION = 1;
+const STARTER_RAW = [];
+function L(section,title,summary,materials,steps,notes,tags){STARTER_RAW.push({section,title,summary,materials:materials.split(';').map(s=>s.trim()),steps:steps.split('|').map(s=>s.trim()),notes,tags:tags.split(',').map(s=>s.trim())});}
+
+/* ---------------- MATH ---------------- */
+L('math','Number Line Hop',
+ 'Kids become the counters! Students hop forward and back on a giant floor number line to act out addition and subtraction stories within 20.',
+ "Painter's tape;Index cards numbered 0–20;Story problem cards;Mini whiteboards & markers",
+ 'Tape a long line on the floor and lay number cards 0–20 in order.|Read a story problem: "Sam had 7 stickers and got 4 more."|A student stands on 7 and hops forward 4 while the class counts on aloud: "8, 9, 10, 11!"|Everyone writes the matching number sentence (7 + 4 = 11) on whiteboards.|Switch to "take away" stories and hop backward.|Let students invent their own story problems for a friend to hop.',
+ 'Perfect for wiggly days. Extend by hopping by 2s, or by starting on the bigger number to practice counting on (1.OA.C.5).',
+ 'Whole Group,Hands-on,Brain Break');
+L('math','Make 10 Go Fish',
+ 'A twist on Go Fish where partners hunt for two cards that make ten — great for building fluency with ten-facts.',
+ 'Decks of cards (face cards removed; Ace = 1);Ten-frame mats;Two-color counters',
+ 'Model with a ten-frame: "I have 6. How many more do I need to make 10?"|Deal 5 cards to each player and spread the rest face-down as the "pond."|On your turn, ask a partner for the card that makes 10 with one in your hand: "Do you have a 4?"|If they don\'t, they say "Go fish!" and you draw.|Lay down each pair and say the fact aloud: "6 + 4 = 10!"|The player with the most pairs when the pond is empty wins.',
+ 'Leave ten-frames out for friends who still need the visual. Works great as a math center once modeled (1.OA.C.6).',
+ 'Centers,Small Group');
+L('math','Paper Clip Measuring',
+ 'How long is it? Students measure classroom objects with paper clips to learn non-standard measurement — no gaps and no overlaps!',
+ 'Jumbo paper clips (some linked into chains);Recording sheet;Objects to measure: pencil, glue stick, crayon box, book, shoe',
+ 'Show a pencil measured the wrong way (with gaps and overlaps). Ask: "What went wrong?"|Model lining up clips end-to-end starting at the very edge.|Partners estimate first, then measure 5 objects and record.|Put the objects in order from shortest to longest.|Share: "Did anything measure exactly the same?"',
+ 'Next day, measure the same objects with cubes and talk about why the numbers changed (1.MD.A.2).',
+ 'Hands-on,Centers,Small Group');
+L('math','100 Things Collections',
+ 'Families send in 100 small objects; students sort them into groups of ten and count by tens to 100.',
+ 'Zip bags with a family note;10-cup sorting mats or ten-frames;Hundreds chart;Recording sheet',
+ 'A week ahead, send home a note asking for 100 small items (cereal, buttons, pom-poms, LEGO).|On 100th Day, students sort their items into 10 groups of 10.|Count together by tens: 10, 20, 30… 100!|Double-check by coloring a hundreds chart while counting by ones.|Do a gallery walk: why do some collections look bigger even though they are all 100?',
+ 'Keep a few extra collections ready for anyone who forgets.',
+ '100th Day,Hands-on,Whole Group');
+L('math','Pumpkin Investigation',
+ 'A hands-on pumpkin day: estimate, measure, test sink or float, and count the seeds by tens.',
+ 'One small pumpkin per group;Yarn & scissors;Scale;Tub of water;Cups & paper towels;Pumpkin recording booklet',
+ 'Estimate how big around the pumpkin is by cutting a piece of yarn. Wrap it around to check who was close!|Weigh the pumpkin and compare it to classroom objects.|Predict: sink or float? Test it in the tub (it floats!).|Scoop the seeds and count them by putting 10 in each cup.|Write one sentence about something surprising.',
+ 'Messy but memorable! Cut the tops off ahead of time. Pumpkins float because they are hollow inside.',
+ 'Fall,Halloween,Hands-on,Small Group');
+L('math','Shape Monster Builders',
+ 'Students compose new shapes with pattern blocks, then design a friendly "shape monster" and count its sides and corners.',
+ 'Pattern blocks;Paper shape cutouts;Glue sticks;Construction paper;Googly eyes (optional)',
+ 'Review shape names, sides, and vertices (corners).|Challenge: build a hexagon out of other blocks. How many ways can you find?|Students glue paper shapes together to build a monster.|Fill in: "My monster has __ triangles and __ squares."|Partners count the total number of sides on each other\'s monsters.',
+ 'Covers 1.G.A.1–2. Hallway display idea: "Shape Monsters Ate Our Hallway!"',
+ 'Hands-on,Centers,Halloween');
+
+/* ---------------- LITERACY ---------------- */
+L('literacy','Sight Word Swat',
+ 'Two players race to swat the sight word that is called — quick, active practice with high-frequency words.',
+ '2 fly swatters;Sight word cards (or words written on the board);Tape',
+ 'Post 10–15 sight words on the board.|Two students stand ready with swatters.|Say a word (or use it in a sentence). The first to swat it reads it aloud for a point.|Rotate players quickly so everyone gets a turn.|Finish by reading all the words together chorally.',
+ 'A great 5-minute warm-up. For small group, play on the table with word cards.',
+ 'Whole Group,Small Group,Brain Break');
+L('literacy','Roll & Read Word Families',
+ 'Students roll a die and read a CVC word from that column, building decoding speed with word families.',
+ 'Roll & Read sheet (6 columns: -at, -an, -ig, -op, -ug, -et);Dice;Highlighters',
+ 'Model blending sounds: /c/ /a/ /t/ — cat!|A partner rolls the die and reads a word from the matching column.|If read correctly, they highlight it.|Keep playing until one column is completely highlighted.|Challenge: write a silly sentence using two of the words.',
+ 'Easy to differentiate — swap in blends, digraphs, or silent-e words.',
+ 'Centers,Small Group');
+L('literacy','Story Map Sticky Notes',
+ 'After a read-aloud, students retell the story by placing sticky notes under Beginning, Middle, and End.',
+ 'Picture book;Chart paper with B / M / E columns;Sticky notes;Crayons or pencils',
+ 'Read the book aloud, stopping to predict.|Turn and talk: What happened first? Next? At the end?|Each student draws or writes one event on a sticky note.|Place the notes in the right column and retell the story together.|Add the characters and setting at the top.',
+ 'Supports RL.1.2 and RL.1.3. Follow up by letting students make their own mini-book retell.',
+ 'Whole Group');
+L('literacy','Sound Boxes',
+ 'Students push a counter into a box for each sound they hear — powerful phonemic awareness and spelling practice.',
+ 'Elkonin box mats (3 and 4 boxes);Counters or mini erasers;Dry-erase markers',
+ 'Say a word slowly: "ship."|Students repeat it and push one counter per sound: /sh/ /i/ /p/.|Count it up: 3 sounds, but 4 letters!|Replace the counters with letters.|Read the word back together.',
+ 'Keep it short (5–8 minutes). Fantastic for intervention groups.',
+ 'Small Group,Hands-on');
+L('literacy','How to Build a Snowman',
+ 'Sequencing writing with First, Next, Then, and Last — students write a how-to for building a snowman.',
+ 'Snowman picture cards;Four-flap writing paper;Crayons;Cotton balls (optional)',
+ 'Read a snowman book and talk about the steps.|Put the picture cards in order as a class.|Model a sentence for each transition word.|Students write and illustrate each step on their flaps.|Share with a partner and act out the steps.',
+ 'Swap the topic by season: How to Carve a Pumpkin, How to Plant a Seed, How to Make a Valentine.',
+ 'Winter,Whole Group');
+L('literacy','Valentine Kindness Letters',
+ 'Students learn the parts of a friendly letter and write a kind valentine to a classmate or school helper.',
+ 'Heart stationery;Friendly letter anchor chart;Crayons & stickers;Envelopes',
+ 'Introduce the parts: date, greeting, body, closing, signature.|Brainstorm kind words and compliments together.|Draw names so everyone receives a letter.|Write and decorate the letters.|Deliver them to mailboxes on Valentine\'s Day.',
+ 'Include the custodian, cafeteria staff, and nurse for a schoolwide smile.',
+ "Valentine's Day,Whole Group");
+
+/* ---------------- SCIENCE ---------------- */
+L('science','Sink or Float?',
+ 'Students predict, test, and sort everyday objects that sink or float.',
+ 'Clear tub of water;Objects: cork, penny, crayon, foil, sponge, apple, rock, plastic spoon;T-chart;Towels',
+ 'Show each object. Students predict with a thumbs up (float) or down (sink).|Test one at a time and record on the T-chart.|Ask: What do the floaters have in common?|Challenge: Can you make the foil float? Can you make it sink?|Draw one surprising result in science journals.',
+ 'Lay towels down! A foil-boat "how many pennies?" challenge makes a great follow-up.',
+ 'Hands-on,Small Group');
+L('science','Seed in a Bag Greenhouse',
+ 'Students sprout a bean in a zip bag taped to the window and observe it grow day by day.',
+ 'Zip bags;Paper towels;Lima beans (soaked overnight);Tape;Spray bottle;Observation journal',
+ 'Wet a paper towel and fold it into the bag.|Place 2–3 beans in the middle and seal it.|Tape the bags to a sunny window with names on them.|Observe each day and draw roots, shoots, and leaves.|After a week, measure growth with cubes.',
+ 'Beans usually sprout in 3–5 days. Mist if the towel dries out.',
+ 'Spring,Hands-on');
+L('science','Five Senses Popcorn',
+ 'Explore all five senses with popcorn — see it, hear it pop, smell it, touch it, and taste it!',
+ 'Air popper or microwave popcorn;Small cups;Five-senses recording sheet;Unpopped kernels',
+ 'Introduce the five senses with an anchor chart.|Look at and touch unpopped kernels. Describe them.|Pop the popcorn — listen and smell!|Taste and describe it with adjectives.|Complete the five-senses sheet.',
+ 'Check for allergies first. Pair with a "popcorn words" adjective chart.',
+ 'Hands-on,Whole Group');
+L('science','Melting Ice Race',
+ 'Where will ice melt fastest? Students predict and test ice cubes in different spots around school.',
+ 'Ice cubes;Small cups or trays;Timer;Recording chart',
+ 'Ask: What makes ice melt?|Choose 4 spots: sunny window, shady corner, desk, and in a zip bag held in hands.|Predict which cube will melt first.|Check every 10 minutes and record.|Discuss heat and compare results to predictions.',
+ 'Add a cube sprinkled with salt for a bonus investigation.',
+ 'Winter,Hands-on,Small Group');
+L('science','Shadow Tracing',
+ 'Students trace a partner\'s shadow with chalk in the morning and afternoon to see how the sun "moves."',
+ 'Sidewalk chalk;A sunny day;Recording sheet;Flashlight & small toy (indoor model)',
+ 'Model shadows indoors with a flashlight and a toy.|Outside in the morning, trace partner shadows and mark where their feet were.|Return after lunch, stand in the same spot, and trace again.|Compare: What changed? Why?|Record observations and draw both shadows.',
+ 'Connects to 1-ESS1-1 (patterns of the sun). Check the forecast for a sunny day!',
+ 'Spring,Hands-on,Whole Group');
+L('science','Good Vibrations',
+ 'Students discover that sound is made by vibrations using rubber bands, drums, and dancing rice.',
+ 'Rubber bands;Shoebox or plastic container;Rice;Bowl covered with plastic wrap;Tuning fork (optional)',
+ 'Hum with a hand on your throat — what do you feel?|Stretch rubber bands over a box and pluck them.|Sprinkle rice on the plastic-wrap drum and tap nearby — watch it bounce!|Compare loud taps and soft taps.|Finish the sentence: "Sound is made when…"',
+ 'Matches 1-PS4-1. The rice dance is always a hit.',
+ 'Hands-on,Centers');
+
+/* ---------------- SOCIAL STUDIES ---------------- */
+L('social','Me on the Map',
+ 'Students make nested circles that show where they live: me → home → street → town → state → country → world.',
+ 'Paper circles in 7 sizes;Crayons;Glue;Globe;Google Earth (optional)',
+ 'Zoom out from the school on Google Earth or a map.|Talk about each level: home, street, town, state, country, continent.|Students label and decorate each circle.|Stack and glue them largest to smallest.|Share: "I live in ___, which is in ___."',
+ 'Send a note home so families can help students learn their address.',
+ 'Whole Group,Hands-on');
+L('social','Community Helpers Interview',
+ 'Students learn about jobs in their community and interview a real community helper.',
+ 'Community helper picture cards;Interview question sheet;Dress-up props (optional);A guest speaker',
+ 'Sort helper cards by what they do (keep us safe, keep us healthy, help us learn).|Brainstorm interview questions as a class.|Invite a guest (nurse, firefighter, parent) to answer questions.|Students draw and write about a job they might like.|Bind the pages into a class book: "When I Grow Up."',
+ 'Ask families ahead of time — many love to visit!',
+ 'Whole Group');
+L('social','Then and Now: School Long Ago',
+ 'Students compare photos of schools long ago with school today using a T-chart.',
+ 'Old schoolhouse photos;T-chart;Picture sort cards (slate, chalkboard, tablet, pencil);Paper',
+ 'Show a one-room schoolhouse photo. What do you notice? What do you wonder?|Compare it with a photo of your classroom.|Sort picture cards into Then and Now.|Write: "Long ago, kids ___. Today we ___."|Discuss: What is still the same?',
+ 'Invite a grandparent to share school memories.',
+ 'Whole Group,Small Group');
+L('social','Our Class Promise',
+ 'Students create and sign a class promise, learning why rules help a community work together.',
+ 'Chart paper;Markers;Washable paint for handprints (or crayons);A picture book about rules',
+ 'Read a story about rules.|Discuss: Why do families, schools, and towns need rules?|Brainstorm promises as positive statements ("We use kind words").|Vote on 4–5 promises.|Everyone signs or adds a handprint.',
+ 'Refer back to it all year. Pairs well with the SEL section.',
+ 'Back to School,Whole Group');
+L('social','Family Traditions Graph',
+ 'Students share family traditions and build a class graph showing how families celebrate.',
+ 'Family survey sheet;Sticky notes;Graph chart;Picture books about traditions',
+ 'Send home a short survey about a favorite family tradition.|Students share their tradition in a circle.|Group similar traditions and graph them with sticky notes.|Discuss what is the same and different.|Make a class book of traditions.',
+ 'Keep it inclusive — every tradition counts (even pancake Saturdays!).',
+ 'Thanksgiving,Fall,Whole Group');
+L('social','Needs vs. Wants Shop',
+ 'Students sort pictures into needs and wants, then "shop" with a pretend budget.',
+ 'Needs/wants picture cards;Play money ($10 each);Price tags;Small items for a pretend store',
+ 'Define needs (food, water, shelter, clothing) and wants.|Sort picture cards together.|Give each student $10 to shop.|They must buy a need first, then a want if money remains.|Reflect: Was it hard to choose?',
+ 'A gentle introduction to economics: choices and scarcity.',
+ 'Hands-on,Small Group,Centers');
+
+/* ---------------- ART ---------------- */
+L('art','Kandinsky Circles',
+ 'Students create concentric circles inspired by Wassily Kandinsky while exploring warm and cool colors.',
+ 'Square paper;Oil pastels;Watercolors & brushes;A Kandinsky print',
+ 'Show "Squares with Concentric Circles" and talk about colors.|Fold paper into 4 squares.|Draw circles inside circles in each square with oil pastels.|Paint over them with watercolors (the pastel resists!).|Assemble everyone\'s work into a class quilt.',
+ 'Makes a stunning bulletin board.',
+ 'Hands-on,Whole Group');
+L('art','Eric Carle Painted Paper Collage',
+ 'Students paint textured papers, then cut them up to build an animal collage just like Eric Carle.',
+ 'White paper;Tempera paints;Texture tools (forks, combs, sponges);Glue sticks;Scissors',
+ 'Read an Eric Carle book and look closely at the illustrations.|Day 1: Paint papers and add texture with tools.|Day 2: Cut shapes from the painted papers.|Assemble an animal on background paper.|Write: "___, ___, what do you see?"',
+ 'Spread over two days so the papers can dry.',
+ 'Hands-on,Spring');
+L('art','Symmetry Butterflies',
+ 'Fold-and-blot painting makes beautifully symmetrical butterflies.',
+ 'Butterfly cutouts (folded in half);Tempera paint;Droppers or spoons;Pipe cleaners',
+ 'Talk about symmetry in nature.|Drop paint on one side of the fold.|Fold, press, and open to reveal the match.|When dry, add a pipe-cleaner body.|Hang them in the windows.',
+ 'Ties nicely to a life cycle science unit.',
+ 'Spring,Hands-on');
+L('art','Salt Watercolor Snowflakes',
+ 'Draw snowflakes with glue, sprinkle salt, and touch on watercolor — the color spreads like magic.',
+ 'Dark blue or black cardstock;White glue;Table salt;Liquid watercolors;Droppers',
+ 'Look at real snowflake photos — six points!|Draw a snowflake with glue.|Cover it with salt and shake off the extra.|Gently touch watercolor to the salt and watch it travel.|Dry flat overnight.',
+ 'Use trays to catch the salt. Drip slowly for the best effect.',
+ 'Winter,Christmas,Hands-on');
+L('art','Fall Leaf Rubbings',
+ 'Students collect leaves and make crayon rubbings to reveal veins, edges, and shapes.',
+ 'Fresh leaves;Peeled crayons in fall colors;Thin paper;Tape',
+ 'Go on a leaf walk around the playground.|Place a leaf vein-side up under the paper.|Rub with the side of a peeled crayon.|Layer more leaves in different colors.|Label the leaf parts (stem, veins, edge).',
+ 'Use fresh leaves — dry ones crumble.',
+ 'Fall,Hands-on');
+L('art','Mirror Self-Portraits',
+ 'Students study their faces in a mirror and draw detailed self-portraits.',
+ 'Small mirrors;Paper;Pencils;Crayons including skin-tone colors;Example portraits',
+ 'Show a few self-portraits by famous artists.|Look in mirrors: notice the shapes of eyes, nose, and hair.|Draw lightly in pencil, then add color.|Add a background showing something you love.|Display as "Our Class Family."',
+ 'Repeat at the end of the year to see how much they have grown!',
+ 'Back to School,Whole Group');
+
+/* ---------------- MUSIC & MOVEMENT ---------------- */
+L('music','Feelings Freeze Dance',
+ 'Dance when the music plays; when it stops, freeze in the shape of the feeling on the card.',
+ 'Music player;Feelings cards (happy, sad, mad, surprised, scared);Open space',
+ 'Review the feelings and what our faces and bodies look like for each.|Play music while students dance.|Stop the music and hold up a feelings card.|Students freeze showing that feeling.|Ask: "When have you felt that way?"',
+ 'A brain break and SEL lesson in one.',
+ 'Whole Group,Brain Break');
+L('music','Rhythm Names',
+ 'Clap the syllables in names, then read simple rhythm notation with "ta" and "ti-ti."',
+ 'Rhythm cards (quarter & eighth notes);Name cards;Rhythm sticks',
+ 'Clap each student\'s name.|Introduce "ta" (one sound on a beat) and "ti-ti" (two sounds on a beat).|Match names to rhythm cards.|Play the rhythms with sticks.|Students compose their own 4-beat rhythm.',
+ 'Builds phonological awareness too!',
+ 'Whole Group,Small Group');
+L('music','Skip-Count Workout',
+ 'Count by 2s, 5s, and 10s while doing exercises — math and movement together.',
+ 'Hundreds chart or skip-counting song;Exercise picture cards',
+ 'Choose a number to count by.|Pick an exercise (jumping jacks, squats, arm circles).|Count aloud with every move up to 100.|Switch exercises and numbers.|Cool down by counting backward slowly.',
+ 'Skip-counting songs on YouTube add variety.',
+ 'Brain Break,Whole Group');
+L('music','Animal Moves Dice',
+ 'Roll a giant die to pick an animal movement — perfect for brain breaks and indoor recess.',
+ 'Large foam die or cube with animal pictures;Music',
+ 'Make the die: frog jump, bear crawl, crab walk, flamingo stand, snake slither, kangaroo hop.|Roll the die.|Everyone moves like that animal for 20 seconds.|Roll again!|End with a slow "sloth" breathing stretch.',
+ 'Swap in seasonal animals (penguin waddle in winter!).',
+ 'Brain Break,Whole Group');
+L('music','Shaker Eggs & Steady Beat',
+ 'Students make shakers and use them to keep a steady beat with songs.',
+ 'Plastic eggs;Rice, beans, or beads;Tape;Stickers',
+ 'Fill eggs with rice or beans and seal them with tape.|Compare the sounds of different fillings.|Practice a steady beat with a favorite song.|Play loud/soft and fast/slow.|Form a class band!',
+ 'Tape the eggs very well!',
+ 'Hands-on,Spring');
+L('music','Parachute Patterns',
+ 'Use a play parachute to make AB and ABC movement patterns.',
+ 'Play parachute;Soft balls;Music',
+ 'Everyone holds a handle.|Make small waves and big waves.|Create a pattern: up-down-up-down (AB).|Add more: up-down-shake (ABC).|Pop balls off the top!',
+ 'Best in the gym or outside. Ties to pattern work in math.',
+ 'Whole Group,Hands-on');
+
+/* ---------------- HOLIDAYS & SEASONS ---------------- */
+L('holidays','All About Me Bag',
+ 'Students bring three items in a paper bag that tell about themselves, then share with the class.',
+ 'Paper lunch bags;Family letter;Sharing schedule',
+ 'Model by sharing your own bag.|Send bags home with a note.|Each day, 3–4 students share their items.|Classmates ask one question each.|Graph the things you have in common.',
+ 'Builds community during the first weeks.',
+ 'Back to School,Whole Group');
+L('holidays','Build-a-Monster Adjectives',
+ 'Students create friendly monsters and describe them using adjectives.',
+ 'Construction paper shapes;Googly eyes;Glue;Adjective word bank',
+ 'Read "Go Away, Big Green Monster!"|Brainstorm describing words together.|Build a monster.|Write three sentences with adjectives.|Classmates guess which monster is being described.',
+ 'Friendly monsters, not scary ones!',
+ 'Halloween,Fall,Centers');
+L('holidays','Gratitude Turkey',
+ 'Students write what they are thankful for on feathers to build a class turkey.',
+ 'Feather cutouts;Brown turkey body;Markers;Glue',
+ 'Talk about gratitude.|Students write one thank-you on each feather.|Add the feathers to the class turkey.|Share in a circle.|Send home a mini version for families.',
+ 'Display in the hallway all November.',
+ 'Thanksgiving,Fall,Whole Group');
+L('holidays','Gingerbread Man Hunt',
+ 'After reading The Gingerbread Man, the class follows clues around school to find him.',
+ 'The Gingerbread Man book;Clue cards;Gingerbread cookies;School map',
+ 'Read the story together.|Discover the gingerbread man has run away!|Follow clues to the office, library, and gym.|Find him back in class with cookies.|Write a retell of the adventure.',
+ 'Let other staff in on the fun. Great for learning school locations.',
+ 'Christmas,Winter,Whole Group');
+L('holidays','Conversation Heart Graphing',
+ 'Sort, graph, and compare candy hearts by color.',
+ 'Conversation hearts (or paper hearts);Graph sheet;Crayons',
+ 'Estimate how many hearts are in your bag.|Sort them by color.|Make a bar graph.|Answer: Most? Least? How many more?|Read the messages for fun.',
+ 'Check for allergies; paper hearts work as an alternative.',
+ "Valentine's Day,Hands-on,Small Group");
+L('holidays',"When I'm 100 Years Old",
+ 'Students imagine life at 100 years old and write and draw about it.',
+ 'Writing paper;Crayons;Cotton balls (for white hair);Aging photo app (optional)',
+ 'Talk about what life might be like at 100.|Brainstorm ideas together.|Write: "When I am 100, I will…"|Draw yourself at 100.|Share with the class.',
+ 'Always a huge hit!',
+ '100th Day,Whole Group');
+L('holidays','Leprechaun Trap STEM',
+ 'Teams design and build a leprechaun trap from recyclables.',
+ 'Recyclables;Tape & glue;Gold coins;Planning sheet',
+ 'Read a leprechaun story.|Plan a trap.|Build with a partner.|Test it out.|Next morning, find tiny footprints!',
+ 'Mid-March fun. Tiny green footprints sell the magic.',
+ "St. Patrick's Day,Spring,Hands-on,Small Group");
+
+/* ---------------- SEL / MANAGEMENT ---------------- */
+L('sel','Morning Meeting Greeting Circle',
+ 'Start the day with a greeting, a share, a quick group activity, and the morning message.',
+ 'Carpet circle;Greeting choice cards;Morning message chart',
+ 'Gather in a circle.|Greeting: handshake, wave, or elbow bump.|Share: one or two students share something.|Group activity: a quick game or song.|Read the morning message together.',
+ '15–20 minutes daily; it pays off all year.',
+ 'Whole Group,Back to School');
+L('sel','Calm-Down Corner',
+ 'Set up a cozy space with tools for big feelings and teach breathing strategies.',
+ 'Pillows or a beanbag;Feelings chart;Sand timer;Breathing cards (smell the flower, blow out the candle);Squishy toys',
+ 'Introduce the corner as a place to help, not a punishment.|Teach each tool, one at a time.|Practice breathing strategies together.|Role-play when to use it.|Check in with students afterward.',
+ 'Model using it yourself!',
+ 'Back to School');
+L('sel','Bucket Filling',
+ 'Students learn to fill each other\'s buckets with kindness.',
+ '"Have You Filled a Bucket Today?";Small cups or buckets;Pom-poms or paper notes',
+ 'Read the book.|Discuss bucket fillers and bucket dippers.|Each student gets a bucket.|Write or draw kind notes to fill each other\'s buckets.|Reflect at the end of the week.',
+ 'An ongoing routine all year long.',
+ 'Whole Group');
+L('sel','Attention Getters',
+ 'A collection of fun call-and-response attention getters.',
+ 'Anchor chart with call-and-responses',
+ 'Teach one at a time: "Class, class!" — "Yes, yes!"|"Hocus pocus!" — "Everybody focus!"|"Macaroni and cheese!" — "Everybody freeze!"|"1, 2, 3, eyes on me!" — "1, 2, eyes on you!"|Practice until automatic.',
+ 'Rotate them to keep things fresh.',
+ 'Whole Group,Back to School');
+L('sel','Classroom Jobs Chart',
+ 'Give every student a job to build responsibility and ownership.',
+ 'Pocket chart;Name cards;Job cards with pictures',
+ 'Brainstorm classroom jobs together.|Explain each job.|Assign jobs and rotate them weekly.|Check in on how jobs went.|Celebrate a job well done.',
+ 'Ideas: line leader, door holder, plant waterer, librarian, messenger.',
+ 'Back to School,Whole Group');
+L('sel','Feelings Check-In',
+ 'Students check in each morning by moving their name to a feelings chart.',
+ 'Feelings chart with zones or emojis;Clothespins with names',
+ 'Teach feelings vocabulary.|Each morning, students clip their name on a feeling.|Quietly check in with anyone who needs it.|Discuss strategies for each feeling.|Notice patterns over time.',
+ 'Make it part of the arrival routine.',
+ 'Whole Group');
+
+const STARTERS = STARTER_RAW.map((l,i)=>{
+  const n = STARTER_RAW.slice(0,i+1).filter(x=>x.section===l.section).length;
+  return Object.assign({id:`st-${l.section}-${n}`, starter:true, mine:false, fav:false, hidden:false, photo:null, order:i, created:0, updated:0}, l);
+});
+
+/* ---------- Inline SVG art ---------- */
+const K = '#2d2a32';
+const DOODLE = {
+ math:`<svg viewBox="0 0 100 100"><g transform="rotate(-18 50 58)"><rect x="8" y="48" width="84" height="24" rx="4" fill="#FFD166" stroke="${K}" stroke-width="3"/><path d="M18 48v8M27 48v12M36 48v8M45 48v12M54 48v8M63 48v12M72 48v8M81 48v12" stroke="${K}" stroke-width="2.6" stroke-linecap="round"/></g><text x="16" y="38" font-family="Fredoka,sans-serif" font-weight="700" font-size="25" fill="#3D8BF2">1+2</text><circle cx="78" cy="28" r="9" fill="#F2545B" stroke="${K}" stroke-width="3"/><path d="M74 28h8M78 24v8" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>`,
+ literacy:`<svg viewBox="0 0 100 100"><path d="M50 30C38 22 22 21 10 25v52c12-4 28-3 40 5z" fill="#fff" stroke="${K}" stroke-width="3" stroke-linejoin="round"/><path d="M50 30c12-8 28-9 40-5v52c-12-4-28-3-40 5z" fill="#FFE5E6" stroke="${K}" stroke-width="3" stroke-linejoin="round"/><path d="M50 30v52" stroke="${K}" stroke-width="3"/><text x="18" y="62" font-family="Fredoka,sans-serif" font-weight="700" font-size="26" fill="#F2545B">A</text><text x="60" y="62" font-family="Fredoka,sans-serif" font-weight="700" font-size="26" fill="#3D8BF2">b</text><path d="M68 10l3 6 6 1-4 4 1 6-6-3-5 3 1-6-4-4 6-1z" fill="#FFD166" stroke="${K}" stroke-width="2"/></svg>`,
+ science:`<svg viewBox="0 0 100 100"><path d="M38 12h24M43 12v28L22 78a7 7 0 0 0 6 10h44a7 7 0 0 0 6-10L57 40V12" fill="#fff" stroke="${K}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M31 62h38l9 16a7 7 0 0 1-6 10H28a7 7 0 0 1-6-10z" fill="#22B07D"/><path d="M22 78a7 7 0 0 0 6 10h44a7 7 0 0 0 6-10L69 62H31z" fill="none" stroke="${K}" stroke-width="3" stroke-linejoin="round"/><circle cx="42" cy="74" r="4" fill="#fff"/><circle cx="55" cy="79" r="3" fill="#fff"/><circle cx="50" cy="52" r="3.5" fill="#bdf0d9" stroke="${K}" stroke-width="2"/><circle cx="58" cy="30" r="4.5" fill="#bdf0d9" stroke="${K}" stroke-width="2"/><circle cx="66" cy="16" r="3" fill="#bdf0d9" stroke="${K}" stroke-width="2"/></svg>`,
+ social:`<svg viewBox="0 0 100 100"><path d="M22 80h56M50 70v10" stroke="${K}" stroke-width="3.5" stroke-linecap="round"/><path d="M18 44a32 32 0 0 0 58 18" fill="none" stroke="#B9844C" stroke-width="5" stroke-linecap="round"/><circle cx="48" cy="40" r="27" fill="#8fd8ee" stroke="${K}" stroke-width="3"/><path d="M30 28c6-4 12 0 14 5s-4 8-8 10-3 8-8 6-4-17 2-21zM56 20c6 0 12 6 14 12s-2 6-6 6-6 6-10 4 0-8-2-11 0-11 4-11zM52 52c4-2 10 0 10 4s-6 8-9 6-4-8-1-10z" fill="#22B07D" stroke="${K}" stroke-width="2"/></svg>`,
+ art:`<svg viewBox="0 0 100 100"><path d="M50 14C26 14 10 30 10 50s16 34 34 34c8 0 8-6 6-11s0-11 8-11h12c12 0 20-6 20-17C90 28 72 14 50 14z" fill="#FFF3D6" stroke="${K}" stroke-width="3"/><circle cx="32" cy="38" r="7" fill="#F2545B"/><circle cx="52" cy="28" r="7" fill="#FFD166"/><circle cx="72" cy="38" r="7" fill="#3D8BF2"/><circle cx="30" cy="60" r="7" fill="#22B07D"/><path d="M60 92l26-36" stroke="#B9844C" stroke-width="6" stroke-linecap="round"/><path d="M84 58l6-9" stroke="#9B5DE5" stroke-width="8" stroke-linecap="round"/></svg>`,
+ music:`<svg viewBox="0 0 100 100"><path d="M36 72V26l44-11v46" fill="none" stroke="${K}" stroke-width="4" stroke-linejoin="round"/><path d="M36 26l44-11v12L36 38z" fill="${K}"/><ellipse cx="27" cy="73" rx="11" ry="8.5" fill="#F15BB5" stroke="${K}" stroke-width="3" transform="rotate(-18 27 73)"/><ellipse cx="71" cy="62" rx="11" ry="8.5" fill="#F15BB5" stroke="${K}" stroke-width="3" transform="rotate(-18 71 62)"/><path d="M12 30q4-8 10 0M84 82q4-8 10 0" fill="none" stroke="#9B5DE5" stroke-width="3" stroke-linecap="round"/></svg>`,
+ holidays:`<svg viewBox="0 0 100 100"><path d="M50 88V60" stroke="#8a5a2b" stroke-width="4" stroke-linecap="round"/><path d="M50 62L30 66l4-8-16-8 8-4-4-12 12 4 2-8 10 10-2-22 8 4 6-10 6 10 8-4-2 22 10-10 2 8 12-4-4 12 8 4-16 8 4 8z" fill="#F7882F" stroke="${K}" stroke-width="3" stroke-linejoin="round"/><path d="M50 62V30M50 50l-12-8M50 50l12-8" stroke="#c45f12" stroke-width="2.4" stroke-linecap="round"/><g stroke="#3D8BF2" stroke-width="2.6" stroke-linecap="round"><path d="M84 70v18M75 79h18M78 73l12 12M90 73L78 85"/></g></svg>`,
+ sel:`<svg viewBox="0 0 100 100"><path d="M50 86S12 64 12 38c0-12 9-22 21-22 8 0 13 4 17 10 4-6 9-10 17-10 12 0 21 10 21 22 0 26-38 48-38 48z" fill="#FF8FB1" stroke="${K}" stroke-width="3" stroke-linejoin="round"/><circle cx="38" cy="42" r="3.6" fill="${K}"/><circle cx="62" cy="42" r="3.6" fill="${K}"/><path d="M38 54q12 11 24 0" fill="none" stroke="${K}" stroke-width="3.2" stroke-linecap="round"/><circle cx="31" cy="51" r="4" fill="#ff5d8f" opacity=".5"/><circle cx="69" cy="51" r="4" fill="#ff5d8f" opacity=".5"/></svg>`,
+ fav:`<svg viewBox="0 0 100 100"><path d="M50 8l12.4 25.2 27.8 4-20.1 19.6 4.7 27.7L50 71.4 25.2 84.5l4.7-27.7L9.8 37.2l27.8-4z" fill="#FFC93C" stroke="${K}" stroke-width="3" stroke-linejoin="round"/><path d="M36 36l6-2" stroke="#fff" stroke-width="4" stroke-linecap="round"/><circle cx="40" cy="52" r="3" fill="${K}"/><circle cx="60" cy="52" r="3" fill="${K}"/><path d="M44 60q6 5 12 0" fill="none" stroke="${K}" stroke-width="2.6" stroke-linecap="round"/></svg>`,
+ all:`<svg viewBox="0 0 100 100"><path d="M50 30c-9-7-34-6-36 18-2 24 15 42 26 42 4 0 7-2 10-2s6 2 10 2c11 0 28-18 26-42-2-24-27-25-36-18z" fill="#F2545B" stroke="${K}" stroke-width="3" stroke-linejoin="round"/><path d="M50 30c0-8 2-14 6-18" stroke="#8a5a2b" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M54 22c6-10 18-12 24-8-4 8-14 12-24 8z" fill="#22B07D" stroke="${K}" stroke-width="2.6" stroke-linejoin="round"/><path d="M28 44c2-6 6-8 10-9" stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none" opacity=".7"/></svg>`,
+ mine:`<svg viewBox="0 0 100 100"><g transform="rotate(40 50 50)"><rect x="40" y="6" width="20" height="62" fill="#FFD166" stroke="${K}" stroke-width="3"/><path d="M46.6 6v62M53.3 6v62" stroke="#e7b443" stroke-width="2"/><rect x="40" y="0" width="20" height="10" rx="3" fill="#FF8FB1" stroke="${K}" stroke-width="3"/><path d="M40 68l10 22 10-22z" fill="#f6d7a7" stroke="${K}" stroke-width="3" stroke-linejoin="round"/><path d="M46.5 82l3.5 8 3.5-8z" fill="${K}"/></g><path d="M14 86q10-8 18 0t18 0" fill="none" stroke="#9B5DE5" stroke-width="3" stroke-linecap="round"/></svg>`,
+ search:`<svg viewBox="0 0 100 100"><circle cx="42" cy="42" r="24" fill="#cfe9ff" stroke="${K}" stroke-width="4"/><path d="M60 60l22 22" stroke="#B9844C" stroke-width="10" stroke-linecap="round"/><path d="M30 34q4-8 12-8" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`,
+ tag:`<svg viewBox="0 0 100 100"><path d="M16 22h34l34 34-28 28-34-34z" fill="#FFD166" stroke="${K}" stroke-width="3" stroke-linejoin="round"/><circle cx="32" cy="36" r="6" fill="#fff" stroke="${K}" stroke-width="3"/><path d="M8 14q10 10 24 22" stroke="#F2545B" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+};
+const ICON = {
+ home:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg>`,
+ search:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>`,
+ gear:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>`,
+ plus:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`,
+ left:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>`,
+ right:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>`,
+ x:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`,
+ pencil:`<svg viewBox="0 0 32 32"><g transform="rotate(45 16 16)"><rect x="12" y="3" width="8" height="20" fill="#FFD166" stroke="${K}" stroke-width="2"/><rect x="12" y="1" width="8" height="5" rx="1.5" fill="#FF8FB1" stroke="${K}" stroke-width="2"/><path d="M12 23l4 7 4-7z" fill="#f6d7a7" stroke="${K}" stroke-width="2" stroke-linejoin="round"/></g></svg>`,
+ starOff:`<svg viewBox="0 0 32 32"><path d="M16 3l3.9 8 8.8 1.3-6.4 6.2 1.5 8.8L16 23.1l-7.8 4.2 1.5-8.8L3.3 12.3l8.8-1.3z" fill="#fff" stroke="#c9bda6" stroke-width="2.4" stroke-linejoin="round"/></svg>`,
+ starOn:`<svg viewBox="0 0 32 32"><path d="M16 3l3.9 8 8.8 1.3-6.4 6.2 1.5 8.8L16 23.1l-7.8 4.2 1.5-8.8L3.3 12.3l8.8-1.3z" fill="#FFC93C" stroke="${K}" stroke-width="2.2" stroke-linejoin="round"/><path d="M11 12.5l3-.6" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+ heart:`<svg viewBox="0 0 24 24"><path d="M12 21s-8-5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6-8 11-8 11z" fill="currentColor"/></svg>`,
+ scissors:`<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="8" cy="24" r="4"/><circle cx="8" cy="8" r="4"/><path d="M11 10.5L27 24M11 21.5L27 8"/></svg>`,
+ list:`<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="5" y="4" width="22" height="25" rx="3"/><path d="M11 2v5M21 2v5M10 13h12M10 18h12M10 23h7"/></svg>`,
+ camera:`<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"><path d="M5 13h7l3-4h10l3 4h7v19H5z"/><circle cx="20" cy="22" r="6"/></svg>`,
+ trash:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>`,
+ eyeOff:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M10.6 6.1A10 10 0 0 1 12 6c6 0 9.5 6 9.5 6a17 17 0 0 1-3 3.6M6.5 7.5A17 17 0 0 0 2.5 12S6 18 12 18a9 9 0 0 0 4.5-1.2"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>`,
+ undo:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>`,
+ download:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>`,
+ upload:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7 9l5-5 5 5M5 20h14"/></svg>`,
+ check:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>`,
+ hand:`<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16h22M19 9l7 7-7 7"/></svg>`,
+};
+function crayon(color, w=130){ return `<svg class="crayon" width="${w}" height="${w*0.2}" viewBox="0 0 130 26"><path d="M24 3h96a6 6 0 0 1 6 6v8a6 6 0 0 1-6 6H24z" fill="${color}"/><path d="M24 3L4 13l20 10z" fill="${color}"/><path d="M4 13l8-4v8z" fill="rgba(0,0,0,.35)"/><rect x="40" y="3" width="56" height="20" fill="rgba(255,255,255,.22)"/><path d="M44 3v20M92 3v20" stroke="rgba(0,0,0,.25)" stroke-width="2"/><path d="M28 6h90" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/></svg>`; }
+function pencilArt(w=150){ return `<svg width="${w}" height="${w*0.18}" viewBox="0 0 150 27"><rect x="28" y="3" width="100" height="21" fill="#FFD166"/><path d="M28 10h100M28 17h100" stroke="#e7b443" stroke-width="2"/><rect x="128" y="3" width="8" height="21" fill="#c9c9c9"/><rect x="136" y="3" width="12" height="21" rx="4" fill="#FF8FB1"/><path d="M28 3L4 13.5 28 24z" fill="#f6d7a7"/><path d="M4 13.5l9-4v8z" fill="#2d2a32"/></svg>`; }
+function rulerArt(w=170){ let t=''; for(let i=0;i<=16;i++){const x=8+i*9.6; t+=`<path d="M${x} 3v${i%4===0?11:i%2===0?8:5}" stroke="#7a5a1d" stroke-width="1.6"/>`;} return `<svg width="${w}" height="${w*0.16}" viewBox="0 0 170 27"><rect x="1" y="2" width="168" height="23" rx="3" fill="#F9D27A" stroke="#c99b3a" stroke-width="2"/>${t}</svg>`; }
+function glueArt(h=78){ return `<svg width="${h*0.55}" height="${h}" viewBox="0 0 44 80"><path d="M18 2h8l2 14H16z" fill="#F7882F"/><rect x="12" y="16" width="20" height="10" rx="2" fill="#F7882F"/><path d="M8 28h28l2 46a4 4 0 0 1-4 4H10a4 4 0 0 1-4-4z" fill="#fff" stroke="#2d2a32" stroke-width="2.5"/><rect x="10" y="42" width="24" height="18" rx="3" fill="#3D8BF2"/><text x="22" y="55" font-family="Fredoka,sans-serif" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">GLUE</text></svg>`; }
+function appleArt(s=60){ return `<svg width="${s}" height="${s}" viewBox="0 0 100 100">${DOODLE.all.replace(/^<svg[^>]*>|<\/svg>$/g,'')}</svg>`; }
+function starSticker(s=48,color='#FFC93C'){ return `<svg class="star" width="${s}" height="${s}" viewBox="0 0 32 32"><path d="M16 2l4.2 8.5 9.4 1.4-6.8 6.6 1.6 9.3L16 23.4l-8.4 4.4 1.6-9.3-6.8-6.6 9.4-1.4z" fill="${color}" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/><path d="M11 12l3-.6" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>`; }
+const PAPERCLIP = `<svg class="clip" viewBox="0 0 26 64"><path d="M8 18V50a6 6 0 0 0 12 0V12A9 9 0 0 0 2 12v40a11 11 0 0 0 22 0V22" fill="none" stroke="#9aa3ad" stroke-width="3.2" stroke-linecap="round"/></svg>`;
+
+/* ================= Data & constants ================= */
+const SECTIONS = [
+ {id:'math',name:'Math',color:'#3D8BF2',cd:'#2765bb',tint:'#E3EEFF',on:'#fff',tagline:'Counting, adding, measuring & more!'},
+ {id:'literacy',name:'Literacy',color:'#F2545B',cd:'#c23b42',tint:'#FFE5E6',on:'#fff',tagline:'Phonics, reading & writing fun'},
+ {id:'science',name:'Science',color:'#22B07D',cd:'#168059',tint:'#DDF6EC',on:'#fff',tagline:'Explore, predict & discover'},
+ {id:'social',name:'Social Studies',color:'#14A9C2',cd:'#0d7a8c',tint:'#DCF4F8',on:'#fff',tagline:'Me, my community & the world'},
+ {id:'art',name:'Art',color:'#9B5DE5',cd:'#7140b0',tint:'#F0E6FC',on:'#fff',tagline:'Create, color & imagine'},
+ {id:'music',name:'Music & Movement',color:'#F15BB5',cd:'#bf3b8a',tint:'#FDE4F3',on:'#fff',tagline:'Sing, dance & wiggle!'},
+ {id:'holidays',name:'Holidays & Seasons',color:'#F7882F',cd:'#c4621a',tint:'#FEEBDC',on:'#fff',tagline:'Celebrate all year long'},
+ {id:'sel',name:'Classroom Management / SEL',short:'Management / SEL',color:'#F2B705',cd:'#b88a00',tint:'#FFF4CC',on:'#3b2f00',tagline:'Kindness, routines & big feelings'},
+];
+const SEC = Object.fromEntries(SECTIONS.map(s=>[s.id,s]));
+const SPECIAL = {
+ home:{color:'#F2545B',cd:'#c23b42',tint:'#FFE5E6',on:'#fff'},
+ fav:{color:'#F2B705',cd:'#b88a00',tint:'#FFF4CC',on:'#3b2f00'},
+ all:{color:'#F2545B',cd:'#c23b42',tint:'#FFE5E6',on:'#fff'},
+ mine:{color:'#9B5DE5',cd:'#7140b0',tint:'#F0E6FC',on:'#fff'},
+ tag:{color:'#14A9C2',cd:'#0d7a8c',tint:'#DCF4F8',on:'#fff'},
+ search:{color:'#3D8BF2',cd:'#2765bb',tint:'#E3EEFF',on:'#fff'},
+};
+const DEFAULT_TAGS = ['Back to School','Fall','Halloween','Thanksgiving','Winter','Christmas','100th Day',"Valentine's Day","St. Patrick's Day",'Spring','Summer','Whole Group','Small Group','Centers','Hands-on','Brain Break'];
+const TAG_COLORS = ['#F2545B','#F7882F','#E0A800','#22B07D','#14A9C2','#3D8BF2','#9B5DE5','#F15BB5'];
+const NOTE_COLORS = ['#fff59d','#ffd3e6','#cfe9ff','#d3f5c7','#ffe0b8','#e6d9ff'];
+const TAG_FIXED = {'Halloween':'#F7882F','Thanksgiving':'#c4621a','Christmas':'#22B07D',"Valentine's Day":'#F15BB5','100th Day':'#3D8BF2','Back to School':'#F2545B','Spring':'#22B07D','Fall':'#F7882F','Winter':'#14A9C2',"St. Patrick's Day":'#22B07D','Summer':'#E0A800'};
+function tagColor(t){ if(TAG_FIXED[t]) return TAG_FIXED[t]; let h=0; for(const c of t) h=(h*31+c.charCodeAt(0))>>>0; return TAG_COLORS[h%TAG_COLORS.length]; }
+
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const uid=()=>'my-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7);
+
+/* ================= Storage (IndexedDB w/ memory fallback) ================= */
+const DB = {
+  db:null, mem:null,
+  open(){ return new Promise((res)=>{
+    try{
+      const r = indexedDB.open('lessonIdeaMagazine',1);
+      r.onupgradeneeded=()=>{ const d=r.result; if(!d.objectStoreNames.contains('lessons')) d.createObjectStore('lessons',{keyPath:'id'}); if(!d.objectStoreNames.contains('meta')) d.createObjectStore('meta',{keyPath:'key'}); };
+      r.onsuccess=()=>{ this.db=r.result; res(true); };
+      r.onerror=()=>{ this.useMem(); res(false); };
+      r.onblocked=()=>{ this.useMem(); res(false); };
+    }catch(e){ this.useMem(); res(false); }
+  });},
+  useMem(){ this.mem={lessons:new Map(),meta:new Map()}; },
+  tx(store,mode,fn){
+    if(this.mem){ return Promise.resolve(fn(null,this.mem[store])); }
+    return new Promise((res,rej)=>{ const t=this.db.transaction(store,mode); const s=t.objectStore(store); let out; const r=fn(s); if(r&&'onsuccess' in r) r.onsuccess=()=>{out=r.result}; t.oncomplete=()=>res(out); t.onerror=()=>rej(t.error); t.onabort=()=>rej(t.error||new Error('aborted')); });
+  },
+  all(){ return this.tx('lessons','readonly',(s,m)=> m?[...m.values()]:s.getAll()); },
+  put(l){ return this.tx('lessons','readwrite',(s,m)=> m?void m.set(l.id,structuredClone(l)):s.put(l)); },
+  putMany(a){ return this.tx('lessons','readwrite',(s,m)=>{ a.forEach(l=> m?m.set(l.id,structuredClone(l)):s.put(l)); }); },
+  del(id){ return this.tx('lessons','readwrite',(s,m)=> m?void m.delete(id):s.delete(id)); },
+  getMeta(k){ return this.tx('meta','readonly',(s,m)=> m?{result:m.get(k)}:s.get(k)).then(r=> this.mem ? r.result : (r?r.value:undefined)); },
+  setMeta(k,v){ return this.tx('meta','readwrite',(s,m)=> m?void m.set(k,v):s.put({key:k,value:v})); },
+};
+
+let lessons = [];            // all lessons (incl hidden)
+let settings = {teacherName:'Mrs. Jones'};
+let customTags = [];
+const byId = id => lessons.find(l=>l.id===id);
+const visible = () => lessons.filter(l=>!l.hidden);
+function sortLessons(list, bySection){
+  const secIdx = id => SECTIONS.findIndex(s=>s.id===id);
+  return list.slice().sort((a,b)=>{
+    if(bySection){ const d=secIdx(a.section)-secIdx(b.section); if(d) return d; }
+    if(a.mine!==b.mine) return a.mine?-1:1;
+    if(a.mine) return (b.created||0)-(a.created||0);
+    return (a.order||0)-(b.order||0);
+  });
+}
+function allTags(){
+  const set = new Set([...DEFAULT_TAGS, ...customTags]);
+  lessons.forEach(l=>(l.tags||[]).forEach(t=>set.add(t)));
+  const extra=[...set].filter(t=>!DEFAULT_TAGS.includes(t)).sort((a,b)=>a.localeCompare(b));
+  return [...DEFAULT_TAGS.filter(t=>set.has(t)), ...extra];
+}
+function normalizeLesson(l){
+  return {
+    id:String(l.id), section: SEC[l.section]? l.section : 'math',
+    title:String(l.title||'Untitled idea').slice(0,200), summary:String(l.summary||''),
+    materials:Array.isArray(l.materials)?l.materials.map(String).filter(Boolean):[], steps:Array.isArray(l.steps)?l.steps.map(String).filter(Boolean):[],
+    notes:String(l.notes||''), tags:Array.isArray(l.tags)?[...new Set(l.tags.map(t=>String(t).trim()).filter(Boolean))]:[],
+    fav:!!l.fav, photo:(typeof l.photo==='string' && l.photo.startsWith('data:image/'))?l.photo:null,
+    mine:!!l.mine, starter:!!l.starter, hidden:!!l.hidden, edited:!!l.edited,
+    order:+l.order||0, created:+l.created||0, updated:+l.updated||0,
+  };
+}
+
+/* ================= Page rendering ================= */
+function secVars(s){ return `--c:${s.color};--cd:${s.cd};--tint:${s.tint};--on:${s.on}`; }
+function tagChip(t, act=true){ return `<button class="chip" style="--tc:${tagColor(t)}" ${act?`data-act="open-tag" data-tag="${esc(t)}"`:''}><span class="hash">#</span>${esc(t)}</button>`; }
+function counts(){ const c={}; visible().forEach(l=>{c[l.section]=(c[l.section]||0)+1}); return c; }
+const plural=(n,w)=>`${n} ${w}${n===1?'':'s'}`;
+
+function renderTOC(){
+  const c = counts(); const v=visible();
+  const tiles = SECTIONS.map(s=>`<button class="tile" style="${secVars(s)}" data-act="open-section" data-id="${s.id}" aria-label="${esc(s.name)}"><span class="tape"></span><span class="ic">${DOODLE[s.id]}</span><span class="nm">${esc(s.name)}</span><span class="ct">${plural(c[s.id]||0,'idea')}</span></button>`).join('');
+  const f=v.filter(l=>l.fav).length, m=v.filter(l=>l.mine).length;
+  const wide=(k,name,n,sub)=>`<button class="tile wide" style="${secVars(SPECIAL[k])}" data-act="open-${k}"><span class="ic">${DOODLE[k]}</span><span class="tx"><span class="nm">${name}</span><span class="ct">${n}</span></span></button>`;
+  return `<div class="page toc"><div class="page-scroll">
+    <div class="chalkboard toc-head">
+      <svg class="chalk-doodle" style="left:18px;top:14px" width="44" height="44" viewBox="0 0 32 32"><path d="M16 3l3.9 8 8.8 1.3-6.4 6.2 1.5 8.8L16 23.1l-7.8 4.2 1.5-8.8L3.3 12.3l8.8-1.3z" fill="none" stroke="#fff" stroke-width="1.8" stroke-dasharray="3 2"/></svg>
+      <svg class="chalk-doodle" style="right:20px;top:18px" width="50" height="40" viewBox="0 0 50 40"><text x="2" y="30" font-family="Patrick Hand,cursive" font-size="28" fill="#fff">ABC</text></svg>
+      <div class="kick">${esc(settings.teacherName||'My')}'s</div>
+      <h1>Lesson Idea Magazine</h1>
+      <div class="sub">First grade fun, all in one place ✏️</div>
+      <div class="ledge">${crayon('#F2545B',96).replace('class="crayon"','class="crayon" style="left:12%"')}${crayon('#3D8BF2',84).replace('class="crayon"','class="crayon" style="left:34%"')}<svg class="crayon" style="right:14%;bottom:12px" width="54" height="22" viewBox="0 0 54 22"><rect x="1" y="1" width="52" height="20" rx="4" fill="#ffb3c7"/><rect x="1" y="1" width="20" height="20" rx="4" fill="#5b8def"/></svg></div>
+    </div>
+    <div class="toc-intro">${starSticker(30)} Pick a section and flip through! ${starSticker(30,'#F15BB5')}</div>
+    <div class="toc-grid">${tiles}</div>
+    <div class="toc-row2">${wide('fav','Favorites',plural(f,'idea'))}${wide('all','All Ideas',plural(v.length,'idea'))}${wide('mine','My Ideas',plural(m,'idea'))}</div>
+    <div class="toc-foot">${pencilArt(150)}${glueArt(64)}${rulerArt(170)}</div>
+  </div></div>`;
+}
+function renderTagsPage(){
+  const v=visible(); const tags=allTags();
+  const notes = tags.map((t,i)=>{ const n=v.filter(l=>l.tags.includes(t)).length; const r=((i*37)%7-3)*0.9;
+    return `<button class="tnote" style="--nc:${NOTE_COLORS[i%NOTE_COLORS.length]};--r:${r}deg" data-act="open-tag" data-tag="${esc(t)}"><span class="pin" style="background:radial-gradient(circle at 35% 35%,#fff8,${tagColor(t)} 55%)"></span><span class="nm">${esc(t)}</span><span class="ct">${plural(n,'idea')}</span></button>`; }).join('');
+  return `<div class="page cork"><div class="page-scroll">
+    <div class="cork-head"><span class="pin"></span><h2>Tag Board</h2><p>Tap a sticky note to flip through every idea with that tag</p></div>
+    <button class="search-fake" data-act="search">${ICON.search}<span>Search all ideas…</span></button>
+    <div class="notes-grid">${notes}</div>
+  </div></div>`;
+}
+function renderTipsPage(){
+  const li=(svg,t)=>`<li>${svg}<span>${t}</span></li>`;
+  return `<div class="page tips"><div class="page-scroll"><div class="chalkboard">
+    <h2>How to use your magazine</h2>
+    <ul>
+      ${li(starSticker(30),'<b>Swipe</b> left or right to turn pages — or tap the page edges, or use the ‹ › buttons.')}
+      ${li(starSticker(30,'#F15BB5'),'Tap the big <b>+</b> button to add your own lesson idea, with a photo if you like.')}
+      ${li(starSticker(30,'#22B07D'),'Tap the <b>star</b> on any lesson to save it to Favorites.')}
+      ${li(starSticker(30,'#3D8BF2'),'Tap a <b>#tag</b> to see every lesson with that tag (Halloween, Centers…).')}
+      ${li(starSticker(30,'#F7882F'),'Tap the <b>pencil</b> to edit any idea. Starter ideas can be edited or hidden.')}
+      ${li(starSticker(30,'#9B5DE5'),'Everything is saved right on this device. Use <b>⚙︎ Settings → Export backup</b> now and then to keep a copy safe.')}
+      ${li(starSticker(30,'#fff'),'Add to Home Screen: tap <b>Share</b> → <b>Add to Home Screen</b> for an app icon.')}
+    </ul></div>
+    <div class="supplies">${crayon('#F2545B',110)}${appleArt(64)}${crayon('#22B07D',110)}</div>
+  </div></div>`;
+}
+function renderCover(d){
+  const s=d.style;
+  const btns = d.sectionId ? `<div class="cover-actions"><button class="btn ghost" data-act="add" data-sec="${d.sectionId}">${ICON.plus} Add ${esc(SEC[d.sectionId].short||SEC[d.sectionId].name)} idea</button></div>` : '';
+  return `<div class="page cover" style="${secVars(s)}"><div class="page-scroll">
+    <div class="cover-card">${PAPERCLIP}<div class="cover-kick">${esc(d.kicker)}</div><h2 class="cover-title">${esc(d.title)}</h2><div class="cover-tag">${esc(d.tagline)}</div></div>
+    <div class="cover-art">${DOODLE[d.doodle]||DOODLE.all}${starSticker(52).replace('class="star"','class="star" style="right:2%;top:6%"')}${starSticker(40,'#F15BB5').replace('class="star"','class="star" style="left:4%;bottom:10%;width:40px;height:40px"')}</div>
+    <div class="cover-count">${plural(d.count,'lesson idea')}</div>
+    ${d.count? `<div class="cover-hint">Swipe to flip ${ICON.hand}</div>`:''}
+    ${btns}
+  </div></div>`;
+}
+function renderLesson(l){
+  if(!l) return renderFiller();
+  const s=SEC[l.section]||SECTIONS[0];
+  const badge = l.mine ? `<span class="badge mine">${ICON.heart} My idea</span>` : `<span class="badge starter">Starter idea</span>${l.edited?'<span class="badge edited">· edited</span>':''}`;
+  const mats = l.materials.length? `<section class="blk"><h3>${ICON.scissors} Materials</h3><ul class="mats">${l.materials.map(m=>`<li>${esc(m)}</li>`).join('')}</ul></section>`:'';
+  const steps = l.steps.length? `<section class="blk"><h3>${ICON.list} Steps</h3><ol class="steps">${l.steps.map(m=>`<li>${esc(m)}</li>`).join('')}</ol></section>`:'';
+  const notes = l.notes? `<div class="sticky pink">${PAPERCLIP}<b>Teacher notes</b>${esc(l.notes).replace(/\n/g,'<br>')}</div>`:'';
+  const photo = l.photo? `<figure class="polaroid" style="margin-left:auto;margin-right:auto"><span class="tape"></span><img src="${l.photo}" alt="Photo for ${esc(l.title)}" draggable="false" loading="eager"><figcaption class="cap">${esc(l.title)}</figcaption></figure>`:'';
+  return `<div class="page lesson" style="${secVars(s)}" data-lesson="${esc(l.id)}"><div class="page-scroll"><div class="sheet">
+    <div class="ls-top"><button class="sec-pill" data-act="open-section" data-id="${s.id}"><i>${DOODLE[s.id]}</i>${esc(s.short||s.name)}</button>${badge}<span class="ls-spacer"></span>
+      <button class="ic-btn fav" data-act="fav" data-id="${esc(l.id)}" aria-pressed="${l.fav}" aria-label="${l.fav?'Remove from favorites':'Add to favorites'}">${l.fav?ICON.starOn:ICON.starOff}</button>
+      <button class="ic-btn" data-act="edit" data-id="${esc(l.id)}" aria-label="Edit lesson">${ICON.pencil}</button></div>
+    <h2 class="ls-title"><span>${esc(l.title)}</span></h2>
+    ${l.summary?`<div class="sticky"><span class="tape"></span>${esc(l.summary)}</div>`:''}
+    ${photo}${mats}${steps}${notes}
+    ${l.tags.length?`<div class="tags">${l.tags.map(t=>tagChip(t)).join('')}</div>`:''}
+    <div class="ls-foot"><hr>${esc(s.name)}<hr></div>
+  </div></div></div>`;
+}
+function renderFiller(d={}){
+  const sec = d.sectionId? SEC[d.sectionId]:null;
+  const style = sec? secVars(sec) : secVars(SPECIAL.home);
+  return `<div class="page lesson endpage" style="${style}"><div class="page-scroll"><div class="sheet">
+    <div class="art">${DOODLE.mine}</div>
+    <h2>${esc(d.title||'Your next great idea goes here!')}</h2>
+    <p>${esc(d.text||'Tap the big plus button any time inspiration strikes.')}</p>
+    <div class="row"><button class="btn colored" data-act="add" ${sec?`data-sec="${sec.id}"`:''}>${ICON.plus} Add an idea</button><button class="btn ghost" data-act="home">${ICON.home} Contents</button></div>
+  </div></div></div>`;
+}
+function renderPage(p){
+  switch(p.t){
+    case 'toc': return renderTOC();
+    case 'tags': return renderTagsPage();
+    case 'tips': return renderTipsPage();
+    case 'cover': return renderCover(p);
+    case 'lesson': return renderLesson(byId(p.id));
+    case 'end': return renderFiller(p);
+    default: return renderFiller();
+  }
+}
+
+/* ================= Books ================= */
+function makeBook(kind,key=''){
+  const v=visible();
+  const cover=(o,list)=>({t:'cover',count:list.length,...o});
+  const lessonPages=list=>list.map(l=>({t:'lesson',id:l.id}));
+  const endFor=(o)=>({t:'end',...o});
+  let b;
+  if(kind==='section' && SEC[key]){
+    const s=SEC[key], list=sortLessons(v.filter(l=>l.section===key));
+    b={title:s.name, style:s, pages:[cover({kicker:'Section',title:s.name,tagline:s.tagline,doodle:s.id,style:s,sectionId:s.id},list),...lessonPages(list),endFor({sectionId:s.id,title:`That's all for ${s.short||s.name}!`,text:'Add your own idea to this section any time.'})]};
+  } else if(kind==='tag' && key){
+    const list=sortLessons(v.filter(l=>l.tags.includes(key)),true);
+    b={title:'#'+key, style:{...SPECIAL.tag,color:tagColor(key)}, pages:[cover({kicker:'Tagged',title:key,tagline:'Every idea with this tag',doodle:'tag',style:{...SPECIAL.tag,color:tagColor(key),cd:shade(tagColor(key))}},list),...lessonPages(list),endFor({title:'The end of this tag!',text:'Add a tag to any lesson from its edit form.'})]};
+    b.style.cd=shade(tagColor(key));
+  } else if(kind==='fav'){
+    const list=sortLessons(v.filter(l=>l.fav),true);
+    b={title:'Favorites', style:SPECIAL.fav, pages:[cover({kicker:'My',title:'Favorites',tagline:list.length?'The best of the best!':'Tap the ☆ on any lesson to add it here',doodle:'fav',style:SPECIAL.fav},list),...lessonPages(list),endFor({title:'Collect more stars!',text:'Tap the star on any lesson to save it here.'})]};
+  } else if(kind==='all'){
+    const list=sortLessons(v,true);
+    b={title:'All Ideas', style:SPECIAL.all, pages:[cover({kicker:'Every',title:'All Ideas',tagline:'Flip through everything',doodle:'all',style:SPECIAL.all},list),...lessonPages(list),endFor({})]};
+  } else if(kind==='mine'){
+    const list=sortLessons(v.filter(l=>l.mine),true);
+    b={title:'My Ideas', style:SPECIAL.mine, pages:[cover({kicker:'Made by me',title:'My Ideas',tagline:list.length?'Lessons you added':'Tap + to add your first idea!',doodle:'mine',style:SPECIAL.mine},list),...lessonPages(list),endFor({})]};
+  } else if(kind==='search' && key){
+    const list=sortLessons(searchLessons(key),true);
+    b={title:`“${key}”`, style:SPECIAL.search, pages:[cover({kicker:'Search',title:`“${key}”`,tagline:'Search results',doodle:'search',style:SPECIAL.search},list),...lessonPages(list),endFor({title:'End of results',text:'Try another search or add a new idea.'})]};
+  } else {
+    kind='home'; key='';
+    b={title:'Contents', style:SPECIAL.home, pages:[{t:'toc',wide:true},{t:'tags'},{t:'tips'}]};
+  }
+  b.kind=kind; b.key=key; return b;
+}
+function shade(hex,amt=.78){ const n=parseInt(hex.slice(1),16); const r=Math.round((n>>16&255)*amt),g=Math.round((n>>8&255)*amt),bb=Math.round((n&255)*amt); return '#'+((1<<24)|(r<<16)|(g<<8)|bb).toString(16).slice(1); }
+function searchLessons(q){
+  const terms=q.toLowerCase().split(/\s+/).filter(Boolean);
+  return visible().filter(l=>{ const hay=[l.title,l.summary,l.notes,...l.materials,...l.steps,...l.tags,SEC[l.section]?.name].join(' ').toLowerCase(); return terms.every(t=>hay.includes(t)); });
+}
+function buildViews(pages, spread){
+  const views=[]; let i=0;
+  while(i<pages.length){
+    if(!spread){ views.push([i]); i++; continue; }
+    if(pages[i].wide){ views.push([i]); i++; continue; }
+    if(i+1<pages.length && !pages[i+1].wide){ views.push([i,i+1]); i+=2; }
+    else { views.push([i,-1]); i++; }
+  }
+  return views;
+}
+
+/* ================= App state & view ================= */
+const bookEl = $('#book');
+const cur = {book:null, views:[], vi:0, spread:false};
+function isSpread(){ const w=bookEl.clientWidth, h=bookEl.clientHeight; return w>=900 && w>h*1.12; }
+function viewHTML(vi){
+  const idxs=cur.views[vi]||[];
+  const spread = idxs.length===2;
+  return `<div class="view${spread?' spread':''}" data-vi="${vi}">${idxs.map(i=> i<0? renderFiller() : renderPage(cur.book.pages[i])).join('')}</div>`;
+}
+function buildViewEl(vi){ const t=document.createElement('template'); t.innerHTML=viewHTML(vi).trim(); return t.content.firstElementChild; }
+function currentEl(){ return bookEl.querySelector('.view.current'); }
+function mountView(vi, anim){
+  const el=buildViewEl(vi); el.classList.add('current'); if(anim) el.classList.add('enter');
+  const old=currentEl(); bookEl.appendChild(el); if(old) old.remove();
+  if(anim) el.addEventListener('animationend',()=>el.classList.remove('enter'),{once:true});
+  cur.vi=vi; updateChrome();
+}
+function refreshView(){
+  const old=currentEl(); const scrolls=old?$$('.page-scroll',old).map(e=>e.scrollTop):[];
+  const el=buildViewEl(cur.vi); el.classList.add('current'); bookEl.appendChild(el); if(old) old.remove();
+  $$('.page-scroll',el).forEach((e,i)=>{ if(scrolls[i]) e.scrollTop=scrolls[i]; });
+  updateChrome();
+}
+function viewIndexForPage(pi){ const i=cur.views.findIndex(v=>v.includes(pi)); return i<0?0:i; }
+function firstPageOfView(vi){ const v=cur.views[vi]; return v? v[0] : 0; }
+function openBook(kind,key='',pageIdx=0,opts={}){
+  cancelFlip();
+  cur.book=makeBook(kind,key); cur.spread=isSpread(); cur.views=buildViews(cur.book.pages,cur.spread);
+  pageIdx=clamp(pageIdx|0,0,cur.book.pages.length-1);
+  mountView(viewIndexForPage(pageIdx), opts.anim!==false);
+  writeHash(opts.push!==false);
+}
+function rebuildBook(focusLessonId){
+  const pi = firstPageOfView(cur.vi);
+  cur.book=makeBook(cur.book.kind,cur.book.key); cur.spread=isSpread(); cur.views=buildViews(cur.book.pages,cur.spread);
+  let target=pi;
+  if(focusLessonId){ const f=cur.book.pages.findIndex(p=>p.t==='lesson'&&p.id===focusLessonId); if(f>=0) target=f; }
+  target=clamp(target,0,cur.book.pages.length-1);
+  cur.vi=viewIndexForPage(target); refreshView(); writeHash(false);
+}
+function updateChrome(){
+  const b=cur.book, s=b.style;
+  const root=document.documentElement.style;
+  root.setProperty('--c',s.color); root.setProperty('--cd',s.cd||shade(s.color)); root.setProperty('--tint',s.tint||'#eee'); root.setProperty('--on',s.on||'#fff');
+  $('#tbTitle').textContent = b.kind==='home' ? (innerWidth<560?'Lesson Ideas':`${settings.teacherName||'My'}'s Lesson Ideas`) : b.title;
+  const n=cur.views.length, vi=cur.vi, v=cur.views[vi];
+  const realPages=v.filter(i=>i>=0).map(i=>i+1);
+  $('#pgText').textContent = n<=1? 'Page 1 of 1' : (realPages.length>1? `Pages ${realPages[0]}–${realPages[realPages.length-1]} of ${b.pages.length}` : `Page ${realPages[0]} of ${b.pages.length}`);
+  $('#pgFill').style.width = (n<=1?100: ((vi)/(n-1))*100)+'%';
+  $('#pgPrev').disabled = vi<=0; $('#pgNext').disabled = vi>=n-1;
+  $('#homeBtn').setAttribute('aria-current', b.kind==='home'?'page':'false');
+}
+
+/* ================= Hash routing ================= */
+function hashFor(){ const b=cur.book, pi=firstPageOfView(cur.vi); return '#/'+[b.kind, b.key?encodeURIComponent(b.key):'-', pi].join('/'); }
+function writeHash(push){ const h=hashFor(); if(location.hash===h) return; try{ push? history.pushState(null,'',h) : history.replaceState(null,'',h);}catch(e){} }
+function readHash(){ const m=location.hash.match(/^#\/([a-z]+)\/([^/]*)\/(\d+)/); if(!m) return {kind:'home',key:'',page:0}; return {kind:m[1], key:m[2]==='-'?'':decodeURIComponent(m[2]), page:+m[3]}; }
+window.addEventListener('popstate',()=>{ closeAllModals(); const r=readHash(); openBook(r.kind,r.key,r.page,{push:false}); });
+
+/* ================= Flip engine ================= */
+let flip=null, animating=false;
+function halfOf(srcEl, side, extra){
+  const W=bookEl.clientWidth, h=W/2;
+  const d=document.createElement('div'); d.className=`half ${side==='L'?'hl':'hr'} ${extra||''}`;
+  const inner=document.createElement('div'); inner.className='half-inner'; inner.style.width=W+'px'; inner.style.left=(side==='L'?0:-h)+'px';
+  const c=srcEl.cloneNode(true); c.classList.remove('current','enter'); c.removeAttribute('data-vi'); inner.appendChild(c); d.appendChild(inner);
+  const s=document.createElement('div'); s.className='shade'; d.appendChild(s);
+  return {d,c,s};
+}
+function copyScroll(from,to){ const a=$$('.page-scroll',from), b=$$('.page-scroll',to); a.forEach((e,i)=>{ if(b[i]&&e.scrollTop) b[i].scrollTop=e.scrollTop; }); }
+function startFlip(dir){
+  if(flip||animating) return false;
+  const t=cur.vi+dir; if(t<0||t>=cur.views.length) return false;
+  const curEl=currentEl(); if(!curEl) return false;
+  const nextEl=buildViewEl(t);
+  const wrap=document.createElement('div'); wrap.className='flip';
+  const W=bookEl.clientWidth; wrap.style.perspective=Math.round(Math.max(1500,W*2.6))+'px';
+  let uL,uR,front,back,flipper=document.createElement('div');
+  if(dir>0){ uL=halfOf(curEl,'L'); uR=halfOf(nextEl,'R'); front=halfOf(curEl,'R','front'); back=halfOf(nextEl,'L','back'); flipper.className='flipper fr'; }
+  else { uL=halfOf(nextEl,'L'); uR=halfOf(curEl,'R'); front=halfOf(curEl,'L','front'); back=halfOf(nextEl,'R','back'); flipper.className='flipper fl'; }
+  flipper.appendChild(front.d); flipper.appendChild(back.d);
+  wrap.appendChild(uL.d); wrap.appendChild(uR.d); wrap.appendChild(flipper);
+  bookEl.appendChild(wrap);
+  [uL,uR,front,back].forEach(x=>{ if(x.c && (x===uL&&dir>0 || x===uR&&dir<0 || x===front)) copyScroll(curEl,x.c); });
+  curEl.style.visibility='hidden';
+  // shading gradients
+  const revealed = dir>0? uR : uL, covered = dir>0? uL : uR;
+  revealed.s.style.background = dir>0? 'linear-gradient(90deg,rgba(0,0,0,.55),rgba(0,0,0,.12) 60%,rgba(0,0,0,.05))' : 'linear-gradient(270deg,rgba(0,0,0,.55),rgba(0,0,0,.12) 60%,rgba(0,0,0,.05))';
+  covered.s.style.background = dir>0? 'linear-gradient(270deg,rgba(0,0,0,.45),rgba(0,0,0,.08))' : 'linear-gradient(90deg,rgba(0,0,0,.45),rgba(0,0,0,.08))';
+  front.s.style.background = dir>0? 'linear-gradient(90deg,rgba(0,0,0,.08),rgba(0,0,0,.5))' : 'linear-gradient(270deg,rgba(0,0,0,.08),rgba(0,0,0,.5))';
+  back.s.style.background = dir>0? 'linear-gradient(270deg,rgba(0,0,0,.08),rgba(0,0,0,.5))' : 'linear-gradient(90deg,rgba(0,0,0,.08),rgba(0,0,0,.5))';
+  // glossy highlight on the moving page
+  const gl=document.createElement('div'); gl.className='shade'; gl.style.background='linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.35) 50%,rgba(255,255,255,0))'; front.d.appendChild(gl);
+  front.d.style.boxShadow='none';
+  flip={dir,t,wrap,flipper,curEl,nextEl,p:0,setP(p){
+    p=clamp(p,0,1); this.p=p; const a=180*p;
+    flipper.style.transform=`rotateY(${dir>0?-a:a}deg)`;
+    const showFront=a<90;
+    front.d.style.visibility=showFront?'visible':'hidden'; back.d.style.visibility=showFront?'hidden':'visible';
+    front.s.style.opacity = showFront? (a/90)*0.85 : 0;
+    gl.style.opacity = showFront? Math.sin(a/90*Math.PI)*0.6 : 0;
+    back.s.style.opacity = showFront? 0 : ((180-a)/90)*0.85;
+    revealed.s.style.opacity = (1-p)*0.9;
+    covered.s.style.opacity = p>0.5 ? Math.sin((p-0.5)*2*Math.PI)*0.55 : 0;
+  }};
+  flip.setP(0);
+  return true;
+}
+function finishFlip(complete){
+  if(!flip) return; const f=flip; flip=null;
+  if(complete){
+    f.nextEl.classList.add('current'); bookEl.insertBefore(f.nextEl,f.wrap);
+    f.wrap.remove(); f.curEl.remove(); cur.vi=f.t; updateChrome(); writeHash(false);
+  } else { f.curEl.style.visibility=''; f.wrap.remove(); }
+}
+function cancelFlip(){ if(flip){ finishFlip(false); } animating=false; }
+const easeInOut=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+const easeOut=t=>1-Math.pow(1-t,3);
+function animateP(from,to,dur,ease,done){
+  animating=true; const t0=performance.now();
+  const step=now=>{ if(!flip){animating=false;return;} const k=Math.min(1,(now-t0)/dur); flip.setP(from+(to-from)*ease(k)); if(k<1) requestAnimationFrame(step); else { animating=false; done&&done(); } };
+  requestAnimationFrame(step);
+}
+function go(dir){
+  if(animating||flip||anyModal()) return;
+  if(startFlip(dir)) animateP(0,1,720,easeInOut,()=>finishFlip(true));
+  else bounce(dir);
+}
+function bounce(dir){ const el=currentEl(); if(!el||!el.animate) return; el.animate([{transform:'none'},{transform:`translateX(${-dir*16}px) rotateY(${dir*2}deg)`},{transform:'none'}],{duration:320,easing:'ease-out'}); }
+
+/* ---------- pointer / drag ---------- */
+let drag=null, suppressClick=false;
+bookEl.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='mouse'&&e.button!==0) return;
+  if(animating||flip||anyModal()) return;
+  drag={id:e.pointerId,x0:e.clientX,y0:e.clientY,mode:null,samples:[[e.timeStamp,e.clientX]]}; suppressClick=false;
+});
+window.addEventListener('pointermove',e=>{
+  if(!drag||e.pointerId!==drag.id) return;
+  const dx=e.clientX-drag.x0, dy=e.clientY-drag.y0;
+  if(!drag.mode){
+    if(Math.abs(dx)<9&&Math.abs(dy)<9) return;
+    if(Math.abs(dx)>Math.abs(dy)*1.15){
+      const dir=dx<0?1:-1; drag.dir=dir; drag.mode=startFlip(dir)?'flip':'rubber';
+      try{bookEl.setPointerCapture(e.pointerId)}catch(_){}
+      suppressClick=true;
+    } else { drag.mode='scroll'; return; }
+  }
+  if(drag.mode==='flip'&&flip){
+    const W=bookEl.clientWidth; const reach = cur.views[cur.vi].length===2||W>700 ? W*0.62 : W*0.78;
+    flip.setP((drag.dir>0?-dx:dx)/reach);
+    drag.samples.push([e.timeStamp,e.clientX]); if(drag.samples.length>6) drag.samples.shift();
+    e.preventDefault();
+  } else if(drag.mode==='rubber'){
+    const el=currentEl(); if(el) el.style.transform=`translateX(${dx*0.12}px)`;
+  }
+},{passive:false});
+function endDrag(e,cancelled){
+  if(!drag||e.pointerId!==drag.id) return; const d=drag; drag=null;
+  if(d.mode==='flip'&&flip){
+    const s=d.samples, a=s[0], b=s[s.length-1]; const dt=Math.max(1,b[0]-a[0]); const v=(b[1]-a[1])/dt*(d.dir>0?-1:1); // px/ms in flip direction
+    const p=flip.p; const complete = cancelled? p>0.5 : (v>0.35 || (p>0.45 && v>-0.25));
+    const to=complete?1:0; const dur=clamp(Math.abs(to-p)*520,140,520);
+    animateP(p,to,dur,easeOut,()=>finishFlip(complete));
+  } else if(d.mode==='rubber'){
+    const el=currentEl(); if(el){ el.style.transition='transform .3s cubic-bezier(.2,1.4,.4,1)'; el.style.transform=''; setTimeout(()=>{el.style.transition=''},320); }
+  }
+}
+window.addEventListener('pointerup',e=>endDrag(e,false));
+window.addEventListener('pointercancel',e=>endDrag(e,true));
+bookEl.addEventListener('click',e=>{ if(suppressClick){ e.stopPropagation(); e.preventDefault(); suppressClick=false; } },true);
+bookEl.addEventListener('dragstart',e=>e.preventDefault());
+
+/* ---------- edge taps & actions ---------- */
+document.addEventListener('click',e=>{
+  const a=e.target.closest('[data-act]');
+  if(a){ handleAction(a.dataset.act,a,e); return; }
+  if(bookEl.contains(e.target) && !e.target.closest('button,a,input,textarea,select,label,img')){
+    const r=bookEl.getBoundingClientRect(); const x=(e.clientX-r.left)/r.width;
+    const zone = r.width<600? 0.16 : 0.12;
+    if(x<zone) go(-1); else if(x>1-zone) go(1);
+  }
+});
+document.addEventListener('keydown',e=>{
+  if(anyModal()){ if(e.key==='Escape') closeTopModal(); return; }
+  if(e.target.closest&&e.target.closest('input,textarea,select')) return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'){ e.preventDefault(); go(1); }
+  else if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); go(-1); }
+  else if(e.key==='Escape'||e.key==='Home'){ if(cur.book.kind!=='home') openBook('home'); }
+});
+async function handleAction(act,el){
+  switch(act){
+    case 'home': closeAllModals(); openBook('home'); break;
+    case 'open-section': closeAllModals(); openBook('section',el.dataset.id); break;
+    case 'open-tag': closeAllModals(); openBook('tag',el.dataset.tag); break;
+    case 'open-fav': openBook('fav'); break;
+    case 'open-all': openBook('all'); break;
+    case 'open-mine': openBook('mine'); break;
+    case 'next': go(1); break;
+    case 'prev': go(-1); break;
+    case 'fav': await toggleFav(el.dataset.id); break;
+    case 'edit': openForm(byId(el.dataset.id)); break;
+    case 'add': openForm(null, el.dataset.sec || (cur.book.kind==='section'?cur.book.key:null)); break;
+    case 'search': openSearch(); break;
+    case 'settings': openSettings(); break;
+  }
+}
+async function toggleFav(id){
+  const l=byId(id); if(!l) return; l.fav=!l.fav; l.updated=Date.now();
+  await DB.put(l); refreshView(); toast(l.fav?'⭐ Added to Favorites':'Removed from Favorites');
+}
+
+/* ---------- resize ---------- */
+let rzT=0;
+function onResize(){ clearTimeout(rzT); rzT=setTimeout(()=>{ if(!cur.book) return; cancelFlip(); const pi=firstPageOfView(cur.vi); const sp=isSpread(); if(sp!==cur.spread){ cur.spread=sp; cur.views=buildViews(cur.book.pages,sp); cur.vi=viewIndexForPage(pi); refreshView(); } },120); }
+window.addEventListener('resize',onResize);
+window.addEventListener('orientationchange',onResize);
+
+/* ================= Modals ================= */
+const modalStack=[];
+function anyModal(){ return modalStack.length>0; }
+function openModal(html,{small=false,style='',onClose}={}){
+  const wrap=document.createElement('div'); wrap.className='modal-wrap'; wrap.setAttribute('role','dialog'); wrap.setAttribute('aria-modal','true');
+  wrap.innerHTML=`<div class="msheet${small?' small':''}" style="${style}">${html}</div>`;
+  document.body.appendChild(wrap); modalStack.push({wrap,onClose});
+  wrap.addEventListener('click',e=>{ if(e.target===wrap) closeModal(wrap); if(e.target.closest('[data-close]')) closeModal(wrap); });
+  return wrap;
+}
+function closeModal(wrap,result){
+  const i=modalStack.findIndex(m=>m.wrap===wrap); if(i<0) return; const m=modalStack.splice(i,1)[0];
+  wrap.classList.add('closing'); setTimeout(()=>wrap.remove(),170); m.onClose&&m.onClose(result);
+}
+function closeTopModal(){ const m=modalStack[modalStack.length-1]; if(m) closeModal(m.wrap); }
+function closeAllModals(){ while(modalStack.length) closeTopModal(); }
+function confirmBox(msg,{ok='OK',danger=true,title='Are you sure?'}={}){
+  return new Promise(res=>{
+    let val=false;
+    const w=openModal(`<div class="mhead" style="background:${danger?'#F2545B':'#3D8BF2'}"><h2>${esc(title)}</h2></div><div class="mbody"><p class="confirm-msg">${esc(msg)}</p></div><div class="mfoot"><span class="sp"></span><button class="btn ghost" data-close>Cancel</button><button class="btn ${danger?'danger':'blue'}" data-ok>${esc(ok)}</button></div>`,{small:true,onClose:()=>res(val)});
+    $('[data-ok]',w).addEventListener('click',()=>{ val=true; closeModal(w); });
+  });
+}
+let toastT=0;
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2200); }
+
+/* ---------- Lesson form ---------- */
+function openForm(lesson, presetSec){
+  const isNew=!lesson;
+  const l = lesson? structuredClone(lesson) : {section:presetSec||'math',title:'',summary:'',materials:[],steps:[],notes:'',tags:[],fav:false,photo:null};
+  const tagsSel=new Set(l.tags); let photo=l.photo||null;
+  const s0=SEC[l.section]||SECTIONS[0];
+  const secOpts=SECTIONS.map(s=>`<label class="secopt" style="--sc:${s.color};--st:${s.tint};--so:${s.on}"><input type="radio" name="sec" value="${s.id}" ${s.id===l.section?'checked':''}><span><i>${DOODLE[s.id]}</i>${esc(s.short||s.name)}</span></label>`).join('');
+  const html=`<div class="mhead"><h2>${isNew?ICON.pencil:ICON.pencil} ${isNew?'New lesson idea':'Edit lesson'}</h2><button class="x" data-close aria-label="Close">${ICON.x}</button></div>
+  <form class="mbody" id="lessonForm" autocomplete="off" novalidate>
+    <div class="fld" id="fTitle"><label for="fi-title">Title</label><input class="inp" id="fi-title" name="title" maxlength="140" placeholder="e.g. Apple Tasting Graph" value="${esc(l.title)}"><div class="err">Please give your idea a title 🙂</div></div>
+    <div class="fld"><div class="lbl">Section</div><div class="secs">${secOpts}</div></div>
+    <div class="fld"><label for="fi-sum">Kid-friendly summary <span class="hint">What's the big idea?</span></label><textarea class="inp short" id="fi-sum" name="summary" placeholder="Students taste red, green & yellow apples and graph their favorite.">${esc(l.summary)}</textarea></div>
+    <div class="fld"><label for="fi-mat">Materials <span class="hint">one per line</span></label><textarea class="inp" id="fi-mat" name="materials" placeholder="Apples (red, green, yellow)&#10;Plates&#10;Graph chart">${esc(l.materials.join('\n'))}</textarea></div>
+    <div class="fld"><label for="fi-steps">Steps <span class="hint">one per line</span></label><textarea class="inp" id="fi-steps" name="steps" placeholder="Slice the apples&#10;Taste each color&#10;Vote with sticky notes">${esc(l.steps.join('\n'))}</textarea></div>
+    <div class="fld"><label for="fi-notes">Notes <span class="hint">optional</span></label><textarea class="inp short" id="fi-notes" name="notes" placeholder="Tips, standards, what to do differently next time…">${esc(l.notes)}</textarea></div>
+    <div class="fld"><div class="lbl">Tags <span class="hint">tap to choose</span></div><div class="tagpick" id="tagPick"></div>
+      <div class="newtag"><input class="inp" id="fi-newtag" maxlength="30" placeholder="Make a new tag…" enterkeyhint="done"><button type="button" class="btn ghost" id="addTagBtn">${ICON.plus} Add</button></div></div>
+    <div class="fld"><div class="lbl">Photo <span class="hint">optional</span></div><div id="photoBox"></div><input type="file" accept="image/*" id="fi-photo" hidden></div>
+    <div class="fld"><button type="button" class="favrow" id="favRow" aria-pressed="${!!l.fav}"></button></div>
+  </form>
+  <div class="mfoot">${!isNew&&l.mine?`<button class="btn danger" id="delBtn">${ICON.trash} Delete</button>`:''}${!isNew&&l.starter?`<button class="btn danger" id="hideBtn">${ICON.eyeOff} Hide</button>${l.edited?`<button class="btn ghost" id="resetBtn">${ICON.undo} Reset</button>`:''}`:''}<span class="sp"></span><button class="btn ghost" data-close>Cancel</button><button class="btn primary" id="saveBtn">${ICON.check} Save</button></div>`;
+  const w=openModal(html,{style:secVars(s0)});
+  const sheet=$('.msheet',w), form=$('#lessonForm',w);
+  form.addEventListener('submit',e=>e.preventDefault());
+  $$('input[name=sec]',w).forEach(r=>r.addEventListener('change',()=>{ const s=SEC[r.value]; sheet.setAttribute('style',secVars(s)); }));
+  const drawTags=()=>{ const all=[...new Set([...allTags(),...tagsSel])]; $('#tagPick',w).innerHTML=all.map(t=>`<button type="button" class="chip" style="--tc:${tagColor(t)}" data-t="${esc(t)}" aria-pressed="${tagsSel.has(t)}"><span class="hash">#</span>${esc(t)}</button>`).join(''); };
+  drawTags();
+  $('#tagPick',w).addEventListener('click',e=>{ const b=e.target.closest('[data-t]'); if(!b) return; const t=b.dataset.t; tagsSel.has(t)?tagsSel.delete(t):tagsSel.add(t); b.setAttribute('aria-pressed',tagsSel.has(t)); });
+  const addTag=()=>{ const inp=$('#fi-newtag',w); let t=inp.value.trim().replace(/^#+/,'').replace(/\s+/g,' '); if(!t) return; const ex=allTags().find(x=>x.toLowerCase()===t.toLowerCase()); if(ex) t=ex; tagsSel.add(t); if(!ex && !customTags.includes(t)){ customTags.push(t); DB.setMeta('customTags',customTags); } inp.value=''; drawTags(); };
+  $('#addTagBtn',w).addEventListener('click',addTag);
+  $('#fi-newtag',w).addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); addTag(); } });
+  const drawPhoto=()=>{ $('#photoBox',w).innerHTML = photo? `<div class="photo-prev"><img src="${photo}" alt="Lesson photo"><button type="button" class="btn danger rm" id="rmPhoto">${ICON.trash}</button></div>` : `<button type="button" class="photo-drop" id="pickPhoto">${ICON.camera}<span>Add a photo</span></button>`;
+    const pp=$('#pickPhoto',w); if(pp) pp.onclick=()=>$('#fi-photo',w).click(); const rm=$('#rmPhoto',w); if(rm) rm.onclick=()=>{ photo=null; drawPhoto(); }; };
+  drawPhoto();
+  $('#fi-photo',w).addEventListener('change',async e=>{ const f=e.target.files[0]; if(!f) return; try{ $('#photoBox',w).innerHTML='<div class="empty">Shrinking photo…</div>'; photo=await compressImage(f); }catch(err){ toast('Sorry, that photo could not be read'); } drawPhoto(); e.target.value=''; });
+  let fav=!!l.fav; const drawFav=()=>{ const b=$('#favRow',w); b.setAttribute('aria-pressed',fav); b.innerHTML=`${fav?ICON.starOn:ICON.starOff}<span>${fav?'In my Favorites':'Add to Favorites'}</span>`; };
+  drawFav(); $('#favRow',w).addEventListener('click',()=>{ fav=!fav; drawFav(); });
+  const lines=v=>v.split('\n').map(s=>s.replace(/^\s*(?:[-*•]|\d+[.)])\s*/,'').trim()).filter(Boolean);
+  $('#saveBtn',w).addEventListener('click',async()=>{
+    const title=$('#fi-title',w).value.trim();
+    if(!title){ $('#fTitle',w).classList.add('bad'); $('#fi-title',w).focus(); return; }
+    const now=Date.now();
+    const data={ title, section:$('input[name=sec]:checked',w).value, summary:$('#fi-sum',w).value.trim(), materials:lines($('#fi-mat',w).value), steps:lines($('#fi-steps',w).value), notes:$('#fi-notes',w).value.trim(), tags:[...tagsSel], photo, fav, updated:now };
+    let rec;
+    if(isNew){ rec=normalizeLesson({id:uid(),mine:true,starter:false,created:now,...data}); lessons.push(rec); }
+    else { rec=byId(lesson.id); Object.assign(rec,data); if(rec.starter) rec.edited=true; }
+    try{ await DB.put(rec); }catch(err){ toast('Could not save — storage may be full'); return; }
+    closeModal(w); afterChange(rec.id, isNew); toast(isNew?'✨ Idea added!':'Saved!');
+  });
+  const del=$('#delBtn',w); if(del) del.addEventListener('click',async()=>{ if(!await confirmBox(`Delete “${lesson.title}”? This can't be undone.`,{ok:'Delete'})) return; await DB.del(lesson.id); lessons=lessons.filter(x=>x.id!==lesson.id); closeModal(w); rebuildBook(); toast('Deleted'); });
+  const hide=$('#hideBtn',w); if(hide) hide.addEventListener('click',async()=>{ if(!await confirmBox(`Hide the starter idea “${lesson.title}”? You can bring it back any time in Settings.`,{ok:'Hide',title:'Hide this idea?'})) return; const r=byId(lesson.id); r.hidden=true; await DB.put(r); closeModal(w); rebuildBook(); toast('Hidden — restore it in Settings'); });
+  const reset=$('#resetBtn',w); if(reset) reset.addEventListener('click',async()=>{ if(!await confirmBox('Put this starter idea back the way it came? Your changes will be lost.',{ok:'Reset',title:'Reset to original?'})) return; const orig=STARTERS.find(s=>s.id===lesson.id); if(!orig) return; const r=byId(lesson.id); Object.assign(r,structuredClone(orig),{fav:r.fav,edited:false,photo:null,updated:Date.now()}); await DB.put(r); closeModal(w); rebuildBook(r.id); toast('Reset to original'); });
+  if(isNew) setTimeout(()=>{ if(matchMedia('(pointer:fine)').matches) $('#fi-title',w).focus(); },60);
+}
+function afterChange(id,isNew){
+  const inBook = cur.book.pages.some(p=>p.t==='lesson'&&p.id===id);
+  const l=byId(id);
+  if(inBook || (!isNew && cur.book.kind!=='home')){
+    const fresh=makeBook(cur.book.kind,cur.book.key);
+    if(fresh.pages.some(p=>p.t==='lesson'&&p.id===id)){ rebuildBook(id); return; }
+    if(!isNew){ rebuildBook(); return; }
+  }
+  const b=makeBook('section',l.section); const pi=b.pages.findIndex(p=>p.t==='lesson'&&p.id===id);
+  openBook('section',l.section,Math.max(0,pi));
+}
+function compressImage(file){
+  return new Promise((res,rej)=>{
+    const url=URL.createObjectURL(file); const img=new Image();
+    img.onload=()=>{ try{ const max=1280; const w=img.naturalWidth,h=img.naturalHeight; const s=Math.min(1,max/Math.max(w,h)); const c=document.createElement('canvas'); c.width=Math.max(1,Math.round(w*s)); c.height=Math.max(1,Math.round(h*s)); const g=c.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,c.width,c.height); g.drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(url); res(c.toDataURL('image/jpeg',0.74)); }catch(e){ rej(e); } };
+    img.onerror=()=>{ URL.revokeObjectURL(url); rej(new Error('bad image')); };
+    img.src=url;
+  });
+}
+
+/* ---------- Search ---------- */
+function openSearch(){
+  const w=openModal(`<div class="mhead"><h2>${ICON.search} Find an idea</h2><button class="x" data-close aria-label="Close">${ICON.x}</button></div>
+    <div class="mbody"><div class="search-in">${ICON.search}<input class="inp" id="q" type="search" placeholder="Try “pumpkin”, “graph”, or “dice”" enterkeyhint="search"></div>
+    <div class="fld" style="margin:16px 0 0"><div class="lbl">Or tap a tag</div><div class="tagpick">${allTags().map(t=>tagChip(t)).join('')}</div></div>
+    <div id="results"></div></div>`,{style:secVars(SPECIAL.search)});
+  const q=$('#q',w), out=$('#results',w);
+  const draw=()=>{ const v=q.value.trim(); if(!v){ out.innerHTML=''; return; } const r=sortLessons(searchLessons(v),true);
+    out.innerHTML = r.length? `<div class="res-list"><button class="btn blue" data-sflip style="align-self:flex-start">${ICON.hand} Flip through ${plural(r.length,'result')}</button>${r.map(l=>{const s=SEC[l.section]; return `<button class="res" style="--rc:${s.cd}" data-goto="${esc(l.id)}"><span class="bar" style="background:${s.color}"></span><span><div class="t">${esc(l.title)}</div><div class="s">${esc(l.summary)}</div><div class="m">${esc(s.name)}${l.mine?' · My idea':''}</div></span></button>`;}).join('')}</div>` : `<div class="empty">No ideas match “${esc(v)}” yet.</div>`; };
+  q.addEventListener('input',draw);
+  q.addEventListener('keydown',e=>{ if(e.key==='Enter'&&q.value.trim()){ closeModal(w); openBook('search',q.value.trim()); } });
+  out.addEventListener('click',e=>{ const g=e.target.closest('[data-goto]'); const v=q.value.trim(); if(g){ closeModal(w); const b=makeBook('search',v); const pi=b.pages.findIndex(p=>p.t==='lesson'&&p.id===g.dataset.goto); openBook('search',v,Math.max(0,pi)); } else if(e.target.closest('[data-sflip]')){ closeModal(w); openBook('search',v); } });
+  setTimeout(()=>q.focus(),80);
+}
+
+/* ---------- Settings / backup ---------- */
+async function openSettings(){
+  const hidden=lessons.filter(l=>l.hidden);
+  let persisted=null, est=null;
+  try{ if(navigator.storage&&navigator.storage.persisted) persisted=await navigator.storage.persisted(); if(navigator.storage&&navigator.storage.estimate) est=await navigator.storage.estimate(); }catch(e){}
+  const lastBk=await DB.getMeta('lastBackup');
+  const used = est&&est.usage? (est.usage/1048576).toFixed(1)+' MB used' : '';
+  const w=openModal(`<div class="mhead"><h2>${ICON.gear} Settings & Backup</h2><button class="x" data-close aria-label="Close">${ICON.x}</button></div>
+  <div class="mbody">
+    <div class="set-sec"><h3>✏️ Magazine name</h3><div class="namefix"><input class="inp" id="tname" maxlength="40" value="${esc(settings.teacherName||'')}" placeholder="Mrs. Jones"><span style="font-size:17px">'s Lesson Idea Magazine</span></div></div>
+    <div class="set-sec"><h3>💾 Backup</h3><p>Your ideas and photos live only on this device. Export a backup file now and then (save it to Files, iCloud Drive, or email it to yourself). ${lastBk?`<br>Last backup: <b>${new Date(lastBk).toLocaleDateString()}</b>`:'<br><b>No backup yet.</b>'}</p>
+      <div class="row"><button class="btn primary" id="expBtn">${ICON.download} Export backup</button><button class="btn ghost" id="impBtn">${ICON.upload} Import backup</button><input type="file" id="impFile" accept="application/json,.json" hidden></div></div>
+    <div class="set-sec"><h3>📦 Storage</h3><p>${persisted===true?'✅ This device has agreed to keep your ideas safe (persistent storage is on).':persisted===false?'Storage is “best effort.” Adding this app to your Home Screen helps keep it safe — and exporting backups is always a good idea.':'Storage status unavailable.'} ${used?'('+used+')':''}</p>
+      ${persisted===false?`<div class="row"><button class="btn ghost" id="persistBtn">Ask to keep my data safe</button></div>`:''}</div>
+    <div class="set-sec"><h3>🙈 Hidden starter ideas (${hidden.length})</h3>${hidden.length? hidden.map(l=>`<div class="hid-item"><span class="t">${esc(l.title)} <span style="color:${SEC[l.section].cd};font-size:14px">· ${esc(SEC[l.section].name)}</span></span><button class="btn ghost" data-unhide="${esc(l.id)}">Show again</button></div>`).join('') : '<p>None — every starter idea is showing.</p>'}</div>
+  </div><div class="mfoot"><span class="sp"></span><button class="btn blue" data-close>Done</button></div>`,{style:secVars(SPECIAL.mine)});
+  const tn=$('#tname',w); tn.addEventListener('change',async()=>{ settings.teacherName=tn.value.trim()||'My'; await DB.setMeta('settings',settings); if(cur.book.kind==='home') refreshView(); else updateChrome(); });
+  $('#expBtn',w).addEventListener('click',exportBackup);
+  $('#impBtn',w).addEventListener('click',()=>$('#impFile',w).click());
+  $('#impFile',w).addEventListener('change',async e=>{ const f=e.target.files[0]; e.target.value=''; if(f){ const ok=await importBackup(f); if(ok) closeModal(w); } });
+  const pb=$('#persistBtn',w); if(pb) pb.addEventListener('click',async()=>{ const r=await requestPersist(); toast(r?'✅ Storage will be kept':'Your browser said “not yet” — keep exporting backups'); });
+  w.addEventListener('click',async e=>{ const u=e.target.closest('[data-unhide]'); if(!u) return; const l=byId(u.dataset.unhide); l.hidden=false; await DB.put(l); u.closest('.hid-item').remove(); rebuildBook(); toast('Showing again'); });
+}
+async function exportBackup(){
+  const data={app:'lesson-idea-magazine',version:1,exportedAt:new Date().toISOString(),settings,customTags,lessons};
+  const json=JSON.stringify(data); const d=new Date(); const name=`lesson-ideas-backup-${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}.json`;
+  const blob=new Blob([json],{type:'application/json'});
+  let shared=false;
+  try{ const touch=matchMedia('(pointer:coarse)').matches; if(touch && navigator.canShare && window.File){ const file=new File([blob],name,{type:'application/json'}); if(navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:'Lesson Ideas Backup'}); shared=true; } } }catch(e){ if(e&&e.name==='AbortError') return; }
+  if(!shared){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1500); }
+  await DB.setMeta('lastBackup',Date.now()); toast(`Backup saved (${plural(lessons.length,'idea')})`);
+}
+async function importBackup(file){
+  let data; try{ data=JSON.parse(await file.text()); }catch(e){ toast('That file is not a valid backup'); return false; }
+  const list = Array.isArray(data)? data : data&&Array.isArray(data.lessons)? data.lessons : null;
+  if(!list){ toast('That file is not a lesson backup'); return false; }
+  const clean=list.filter(l=>l&&l.id&&l.title).map(normalizeLesson);
+  if(!await confirmBox(`Import ${plural(clean.length,'idea')}? Ideas already here with the same ID will be replaced by the backup copy. Nothing else is removed.`,{ok:'Import',danger:false,title:'Import backup'})) return false;
+  await DB.putMany(clean);
+  if(data.customTags&&Array.isArray(data.customTags)){ customTags=[...new Set([...customTags,...data.customTags.map(String)])]; await DB.setMeta('customTags',customTags); }
+  if(data.settings&&data.settings.teacherName&&(!settings.teacherName||settings.teacherName==='Mrs. Jones')){ settings.teacherName=String(data.settings.teacherName).slice(0,40); await DB.setMeta('settings',settings); }
+  lessons=(await DB.all()).map(normalizeLesson);
+  rebuildBook(); toast(`Imported ${plural(clean.length,'idea')} 🎉`); return true;
+}
+async function requestPersist(){ try{ if(navigator.storage&&navigator.storage.persist){ return await navigator.storage.persist(); } }catch(e){} return false; }
+
+/* ================= Boot ================= */
+async function boot(){
+  await DB.open();
+  if(DB.mem) setTimeout(()=>toast('Private mode: ideas will not be saved after closing'),800);
+  const seeded=await DB.getMeta('seedVersion');
+  if(!seeded){ await DB.putMany(STARTERS.map(s=>structuredClone(s))); await DB.setMeta('seedVersion',SEED_VERSION); }
+  else if(seeded<SEED_VERSION){ const have=new Set((await DB.all()).map(l=>l.id)); await DB.putMany(STARTERS.filter(s=>!have.has(s.id)).map(s=>structuredClone(s))); await DB.setMeta('seedVersion',SEED_VERSION); }
+  lessons=(await DB.all()).map(normalizeLesson);
+  settings=Object.assign({teacherName:'Mrs. Jones'},await DB.getMeta('settings')||{});
+  customTags=(await DB.getMeta('customTags'))||[];
+  $('#loading')?.remove();
+  const r=readHash(); cur.book=null;
+  openBook(r.kind,r.key,r.page,{push:false,anim:true});
+  try{ history.replaceState(null,'',hashFor()); }catch(e){}
+  requestPersist();
+  if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+window.__lm={go,startFlip,get flip(){return flip},finishFlip,openBook,cur};
+boot();
+
+})();
+</script>
+</body>
+</html>
