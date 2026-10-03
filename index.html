@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<meta name="app-version" content="2-gesture">
+<meta name="app-version" content="3-compact-bar">
 <meta name="googlebot" content="noindex, nofollow">
 <title>Lesson Idea Magazine</title>
 <meta name="description" content="A cozy flip-through magazine of first-grade lesson ideas.">
@@ -55,7 +55,7 @@ svg{display:block}
 /* ---------- Desk & book ---------- */
 .desk{flex:1;position:relative;overflow:hidden;background-color:var(--desk);
   background-image:radial-gradient(rgba(150,110,60,.10) 1.2px,transparent 1.6px);background-size:18px 18px}
-.book{position:absolute;inset:14px 16px 14px 16px;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.book{position:absolute;inset:14px 16px 10px 16px;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 @media (max-width:600px){ .book{inset:8px 8px 8px 8px} }
 .view{position:absolute;inset:0;display:flex;border-radius:var(--radius);overflow:hidden;background:var(--paper);
   box-shadow:0 12px 30px rgba(80,50,10,.18),0 2px 0 rgba(80,50,10,.08);transform:translateZ(0)}
@@ -83,19 +83,19 @@ svg{display:block}
 .flipper>.half.back{transform:rotateY(180deg)}
 .flip-shadow{position:absolute;top:0;bottom:0;width:50%;pointer-events:none;z-index:4;opacity:0}
 
-/* ---------- Bottom bar (solid) ---------- */
-.bottombar{flex:none;background:var(--hdr);border-top:2px solid #f0e6d3;position:relative;z-index:30;
-  padding:0 max(12px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(12px,env(safe-area-inset-left))}
-.bottombar-inner{height:58px;display:flex;align-items:center;gap:12px}
-.pg-btn{width:56px;height:44px;border-radius:14px;background:var(--tint);color:var(--cd);display:flex;align-items:center;justify-content:center;transition:transform .12s,opacity .2s}
-.pg-btn:active{transform:scale(.92)}
+/* ---------- Bottom bar (solid, compact & subtle) ---------- */
+.bottombar{flex:none;background:var(--hdr);border-top:1px solid #f1e9da;position:relative;z-index:30;
+  padding:0 max(10px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(10px,env(safe-area-inset-left))}
+.bottombar-inner{height:30px;display:flex;align-items:center;gap:10px}
+.pg-btn{position:relative;width:34px;height:24px;border-radius:8px;background:#f7f3ec;color:#a2988a;display:flex;align-items:center;justify-content:center;transition:transform .12s,opacity .2s,background .15s}
+.pg-btn::after{content:"";position:absolute;inset:-4px -6px}  /* larger invisible tap target */
+.pg-btn:active{transform:scale(.9);background:var(--tint);color:var(--cd)}
 .pg-btn[disabled]{opacity:.35;cursor:default}
-.pg-btn svg{width:26px;height:26px}
-.pg-mid{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:5px}
-.pg-text{font-size:15px;font-weight:500;color:var(--ink2)}
-.pg-track{width:min(320px,100%);height:9px;border-radius:9px;background:#f1eadd;overflow:hidden;position:relative}
-.pg-fill{position:absolute;left:0;top:0;bottom:0;border-radius:9px;background:var(--c);transition:width .35s ease;
-  background-image:repeating-linear-gradient(-45deg,rgba(255,255,255,.25) 0 6px,transparent 6px 12px)}
+.pg-btn svg{width:16px;height:16px}
+.pg-mid{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px}
+.pg-text{font-size:12px;line-height:14px;font-weight:500;color:#aaa192;letter-spacing:.2px}
+.pg-track{width:min(180px,60%);height:2px;border-radius:2px;background:#efe8db;overflow:hidden;position:relative}
+.pg-fill{position:absolute;left:0;top:0;bottom:0;border-radius:2px;background:var(--c);opacity:.75;transition:width .35s ease}
 
 /* ---------- FAB ---------- */
 .fab{position:absolute;right:max(26px,env(safe-area-inset-right));bottom:24px;z-index:20;width:70px;height:70px;border-radius:50%;
